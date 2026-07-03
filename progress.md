@@ -29,8 +29,8 @@ Waves gate delivery: finish a wave before starting the next. Approval checkpoint
 | 1 | `foundations/thinking-in-react.md` | 🟢 | **First deliverable.** Mental-model anchor — everything references it. Opus tier |
 | 2 | `foundations/jsx-and-rendering.md` | 🟢 | |
 | 3 | `foundations/components-and-props.md` | 🟢 | |
-| 4 | `state/state-and-usestate.md` | ⚪ | Second deliverable — snapshots, batching. Opus tier |
-| 5 | `rendering/rendering-lists-and-keys.md` | ⚪ | Locks the stable-key convention |
+| 4 | `state/state-and-usestate.md` | 🟢 | Second deliverable — snapshots, batching. Opus tier |
+| 5 | `rendering/rendering-lists-and-keys.md` | 🟢 | Locks the stable-key convention |
 | 6 | `foundations/conditional-rendering-and-events.md` | ⚪ | |
 | 7 | `forms/forms-controlled-and-uncontrolled.md` | ⚪ | |
 | 8 | `foundations/component-composition.md` | ⚪ | Composition-beats-memoization groundwork for the performance track |
@@ -148,7 +148,7 @@ Additive bridge articles/annotations for Angular developers. Explicitly out of s
 14. References (official docs)
 15. Demo source
 
-Depth target: 450–650 lines per article. Old-vs-new dual examples appear only where React itself has legacy forms: `forwardRef` vs ref-as-prop, class error boundaries, pre-Actions form handling, manual memoization vs Compiler.
+Coverage bar, not line quota: every template section earning its place; typical range 380–650 lines, with length as a smell test only. Old-vs-new dual examples appear only where React itself has legacy forms: `forwardRef` vs ref-as-prop, class error boundaries, pre-Actions form handling, manual memoization vs Compiler.
 
 ### Recipe structure
 

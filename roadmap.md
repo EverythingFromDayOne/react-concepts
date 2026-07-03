@@ -144,7 +144,7 @@ Recipes begin after Wave 1 articles are complete, then run in parallel with Wave
 
 frontmatter (`article_id`, `concept_folder`, `wave`, `related`, `react_baseline`, `status`) → lead-with-this callout → what it is → how it works under the hood (real internals, traced) → basic usage (complete, runnable) → walkthrough (build something small end-to-end, full files) → real-world patterns → API/type reference table (when applicable) → common mistakes (7–10, with code) → how this evolved (when applicable) → exercises (2–3, with hints) → summary → see also → references (official docs) → demo source
 
-Depth target: **450–650 lines per article.** Parity with angular-concepts is measured in knowledge range, not raw line count — the Angular articles carry substantial legacy dual-code from the translation mandate that greenfield React content doesn't inherit. Deliberately not inherited: "what changed since the original" callouts, preserved legacy walkthroughs, author/translation footers.
+Coverage bar, not line quota: every template section earning its place — internals actually traced, one end-to-end walkthrough, 7–10 real mistakes with code, exercises with hints. Articles typically land at 380–650 lines; length is a smell test for missing coverage, never the goal. Parity with angular-concepts is measured in knowledge range, not raw line count — the Angular articles carry substantial legacy dual-code from the translation mandate that greenfield React content doesn't inherit. Deliberately not inherited: "what changed since the original" callouts, preserved legacy walkthroughs, author/translation footers.
 
 ### Recipe template — **adopted with one rename**
 
