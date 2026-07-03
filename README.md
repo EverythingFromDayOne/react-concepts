@@ -1,4 +1,4 @@
-# reactjs-concepts
+# react-concepts
 
 A modern, opinionated React learning resource — original English-language content built alongside the [nxhhuy.tech](https://nxhhuy.tech) roadmap.
 

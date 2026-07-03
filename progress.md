@@ -1,4 +1,4 @@
-# reactjs-concepts — progress
+# react-concepts — progress
 
 Maintainer-facing tracking document. See [`README.md`](README.md) for the reader-facing entry point and [`roadmap.md`](roadmap.md) for the planning rationale.
 
