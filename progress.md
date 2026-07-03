@@ -1,4 +1,4 @@
-# react-concepts — progress
+# reactjs-concepts — progress
 
 Maintainer-facing tracking document. See [`README.md`](README.md) for the reader-facing entry point and [`roadmap.md`](roadmap.md) for the planning rationale.
 
@@ -18,7 +18,7 @@ Maintainer-facing tracking document. See [`README.md`](README.md) for the reader
 
 ---
 
-## Phase 1a — foundation articles (⚪ queued)
+## Phase 1a — foundation articles (🟡 in progress)
 
 Waves gate delivery: finish a wave before starting the next. Approval checkpoint after the first 3 articles, then rolling delivery.
 
@@ -26,9 +26,9 @@ Waves gate delivery: finish a wave before starting the next. Approval checkpoint
 
 | # | Article | Status | Notes |
 | --- | --- | --- | --- |
-| 1 | `foundations/thinking-in-react.md` | ⚪ | **First deliverable.** Mental-model anchor — everything references it. Opus tier |
-| 2 | `foundations/jsx-and-rendering.md` | ⚪ | |
-| 3 | `foundations/components-and-props.md` | ⚪ | |
+| 1 | `foundations/thinking-in-react.md` | 🟢 | **First deliverable.** Mental-model anchor — everything references it. Opus tier |
+| 2 | `foundations/jsx-and-rendering.md` | 🟢 | |
+| 3 | `foundations/components-and-props.md` | 🟢 | |
 | 4 | `state/state-and-usestate.md` | ⚪ | Second deliverable — snapshots, batching. Opus tier |
 | 5 | `rendering/rendering-lists-and-keys.md` | ⚪ | Locks the stable-key convention |
 | 6 | `foundations/conditional-rendering-and-events.md` | ⚪ | |
@@ -130,19 +130,25 @@ Additive bridge articles/annotations for Angular developers. Explicitly out of s
 
 ## Locked editorial conventions
 
-### Article structure (concept articles)
+### Article structure (concept articles) — v2, July 2026 depth revision
 
-1. Frontmatter (`article_id`, `related`, `react_baseline: "19.2"`)
+1. Frontmatter (`article_id`, `concept_folder`, `wave`, `related`, `react_baseline`, `status`)
 2. Lead-with-this callout (one-paragraph hook)
 3. What it is
-4. How it works under the hood (mechanism explanation)
-5. Basic usage
-6. Real-world patterns
-7. Common mistakes
-8. How this evolved (when applicable — anchored to the class → hooks → concurrent → 19 Actions → Compiler arc)
-9. See also
+4. How it works under the hood (real internals, traced — fiber shapes, compile output, comparison semantics)
+5. Basic usage (complete and runnable, imports included)
+6. Walkthrough — build something small end-to-end (progressive steps, full files)
+7. Real-world patterns
+8. API/type reference table (when applicable)
+9. Common mistakes (7–10, with code)
+10. How this evolved (when applicable — anchored to the class → hooks → concurrent → 19 Actions → Compiler arc)
+11. Exercises (2–3, with hints)
+12. Summary
+13. See also
+14. References (official docs)
+15. Demo source
 
-Old-vs-new dual examples appear only where React itself has legacy forms: `forwardRef` vs ref-as-prop, class error boundaries, pre-Actions form handling, manual memoization vs Compiler.
+Depth target: 450–650 lines per article. Old-vs-new dual examples appear only where React itself has legacy forms: `forwardRef` vs ref-as-prop, class error boundaries, pre-Actions form handling, manual memoization vs Compiler.
 
 ### Recipe structure
 

@@ -140,9 +140,11 @@ Recipes begin after Wave 1 articles are complete, then run in parallel with Wave
 - No zoneless/change-detection framing — replaced by the render/commit + Compiler narrative.
 - No NgModule-vs-standalone dual examples — React has one component model; dual examples only appear where React itself has old/new forms (forwardRef, class error boundaries, pre-Actions form handling).
 
-### Article template — **adopted as-is**
+### Article template — **v2, revised July 2026 for depth parity with angular-concepts**
 
-frontmatter (`article_id`, `related`, `react_baseline: "19.2"`) → lead-with-this callout → what it is → how it works under the hood → basic usage → real-world patterns → common mistakes → how this evolved (when applicable) → see also
+frontmatter (`article_id`, `concept_folder`, `wave`, `related`, `react_baseline`, `status`) → lead-with-this callout → what it is → how it works under the hood (real internals, traced) → basic usage (complete, runnable) → walkthrough (build something small end-to-end, full files) → real-world patterns → API/type reference table (when applicable) → common mistakes (7–10, with code) → how this evolved (when applicable) → exercises (2–3, with hints) → summary → see also → references (official docs) → demo source
+
+Depth target: **450–650 lines per article.** Parity with angular-concepts is measured in knowledge range, not raw line count — the Angular articles carry substantial legacy dual-code from the translation mandate that greenfield React content doesn't inherit. Deliberately not inherited: "what changed since the original" callouts, preserved legacy walkthroughs, author/translation footers.
 
 ### Recipe template — **adopted with one rename**
 
