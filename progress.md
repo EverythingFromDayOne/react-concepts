@@ -31,11 +31,11 @@ Waves gate delivery: finish a wave before starting the next. Approval checkpoint
 | 3 | `foundations/components-and-props.md` | 🟢 | |
 | 4 | `state/state-and-usestate.md` | 🟢 | Second deliverable — snapshots, batching. Opus tier |
 | 5 | `rendering/rendering-lists-and-keys.md` | 🟢 | Locks the stable-key convention |
-| 6 | `foundations/conditional-rendering-and-events.md` | ⚪ | |
-| 7 | `forms/forms-controlled-and-uncontrolled.md` | ⚪ | |
-| 8 | `foundations/component-composition.md` | ⚪ | Composition-beats-memoization groundwork for the performance track |
-| 9 | `effects/effects-and-synchronization.md` | ⚪ | Third deliverable — cleanup, StrictMode double-invoke, AbortController pattern locked here. Opus tier |
-| 10 | `foundations/rules-of-react.md` | ⚪ | Framed as the contract the Compiler enforces |
+| 6 | `foundations/conditional-rendering-and-events.md` | 🟢 | |
+| 7 | `forms/forms-controlled-and-uncontrolled.md` | 🟢 | |
+| 8 | `foundations/component-composition.md` | 🟢 | Composition-beats-memoization groundwork for the performance track |
+| 9 | `effects/effects-and-synchronization.md` | 🟢 | Third deliverable — cleanup, StrictMode double-invoke, AbortController pattern locked here. Opus tier |
+| 10 | `foundations/rules-of-react.md` | 🟢 | Framed as the contract the Compiler enforces |
 
 ### Wave 2 — Intermediate
 
@@ -53,7 +53,7 @@ Waves gate delivery: finish a wave before starting the next. Approval checkpoint
 
 ---
 
-## Phase 1b — recipes (⚪ gated on Wave 1)
+## Phase 1b — recipes (⚪ unblocked — Wave 1 complete)
 
 Starts once Wave 1 articles are complete, then runs in parallel with Waves 2–4. Track order per `roadmap.md` §4.
 
