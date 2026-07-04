@@ -41,19 +41,19 @@ Waves gate delivery: finish a wave before starting the next. Approval checkpoint
 
 | # | Article | Status | Notes |
 | --- | --- | --- | --- |
-| 11 | `rendering/how-react-renders.md` | ⚪ | Fiber, render/commit — the "under the hood" anchor. Opus tier |
-| 12 | `effects/useref-and-the-dom.md` | ⚪ | ref-as-prop baseline; legacy `forwardRef` with marker |
-| 13 | `state/context.md` | ⚪ | What it's for / not for; split-context pattern |
-| 14 | `state/usereducer-and-state-structure.md` | ⚪ | Derive-don't-mirror lives here |
-| 15 | `effects/custom-hooks.md` | ⚪ | |
-| 16 | `rendering/memoization-and-the-compiler.md` | ⚪ | Compiler-first stance. Opus tier |
+| 11 | `rendering/how-react-renders.md` | 🟢 | Fiber, render/commit — the "under the hood" anchor. Opus tier |
+| 12 | `effects/useref-and-the-dom.md` | 🟢 | ref-as-prop baseline; legacy `forwardRef` with marker |
+| 13 | `state/context.md` | 🟢 | What it's for / not for; split-context pattern |
+| 14 | `state/usereducer-and-state-structure.md` | 🟢 | Derive-don't-mirror lives here |
+| 15 | `effects/custom-hooks.md` | 🟢 | |
+| 16 | `rendering/memoization-and-the-compiler.md` | 🟢 | Compiler-first stance. Opus tier |
 | 17 | `rendering/error-boundaries.md` | ⚪ | The one class use-case; `react-error-boundary` in practice |
 | 18 | `rendering/portals-and-the-event-system.md` | ⚪ | |
 | 19 | `effects/escape-hatches-audit.md` | ⚪ | `useSyncExternalStore`, `useLayoutEffect`, `flushSync` |
 
 ---
 
-## Phase 1b — recipes (⚪ unblocked — Wave 1 complete)
+## Phase 1b — recipes (🟡 in progress — Wave 1 complete)
 
 Starts once Wave 1 articles are complete, then runs in parallel with Waves 2–4. Track order per `roadmap.md` §4.
 
@@ -61,9 +61,9 @@ Starts once Wave 1 articles are complete, then runs in parallel with Waves 2–4
 
 | # | Recipe | Status | Scenario |
 | --- | --- | --- | --- |
-| 1 | `recipes/data-fetching/search-race-condition.md` | ⚪ | Stale "rea" response lands after "react" response and overwrites it. Fix arc: ignore-flag → AbortController → TanStack Query. The foundational recipe — heaviest expected in-degree |
-| 2 | `recipes/performance/typing-lag-rerender-storm.md` | ⚪ | Controlled input in a 300-row dashboard; 180ms per keystroke. Fix arc: colocation → composition → Compiler verification. Deliberately not "sprinkle useMemo" |
-| 3 | `recipes/forms-and-ux/double-submit-and-optimistic-like.md` | ⚪ | Two orders from a double-click; Like count flickers back on failure. Fix arc: form actions + `useActionState` → `useOptimistic` with rollback |
+| 1 | `recipes/data-fetching/search-race-condition.md` | 🟢 | Stale "rea" response lands after "react" response and overwrites it. Fix arc: ignore-flag → AbortController → TanStack Query. The foundational recipe — heaviest expected in-degree |
+| 2 | `recipes/performance/typing-lag-rerender-storm.md` | 🟢 | Controlled input in a 300-row dashboard; 180ms per keystroke. Fix arc: colocation → composition → Compiler verification. Deliberately not "sprinkle useMemo" |
+| 3 | `recipes/forms-and-ux/double-submit-and-optimistic-like.md` | 🟢 | Two orders from a double-click; Like count flickers back on failure. Fix arc: form actions + `useActionState` → `useOptimistic` with rollback |
 
 ### Queued recipe candidates by track
 
@@ -200,3 +200,10 @@ Show old vs new patterns side by side with the marker comment:
 - [ ] Demo hosting — StackBlitz vs CodeSandbox vs local `demos/` folder for recipe demo sources
 - [ ] Model allocation — Opus flags marked in the tables above (8 articles); confirm the rest as Sonnet-tier
 - [ ] `recipes/index.md` longer-form index — revisit once ≥10 recipes exist
+
+---
+
+## Session log
+
+- **Session 1 (July 2026):** roadmap approved; README/progress scaffolded; **Wave 1 complete** (articles 1–10, ~4,300 lines); **locked recipe trio complete** (search-race-condition, typing-lag-rerender-storm, double-submit-and-optimistic-like, ~875 lines); template v2 depth revision + coverage-bar reframe locked mid-session; session closed with `handoff-session-2.md` (ownership map + forward-reference debt registry). Next session opens Wave 2 with `rendering/how-react-renders.md`.
+- **Session 2 (July 2026):** Wave 2 opened — `rendering/how-react-renders.md` (480 lines, Opus tier), `effects/useref-and-the-dom.md` (536 lines), `state/context.md` (397 lines), `state/usereducer-and-state-structure.md` (433 lines), `effects/custom-hooks.md` (385 lines), `rendering/memoization-and-the-compiler.md` (356 lines, Opus tier) delivered.
