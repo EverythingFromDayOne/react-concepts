@@ -3,10 +3,10 @@ article_id: components-and-props
 concept_folder: foundations
 wave: 1
 related:
-  - thinking-in-react
-  - jsx-and-rendering
-  - component-composition
-  - rules-of-react
+  - foundations/thinking-in-react
+  - foundations/jsx-and-rendering
+  - foundations/component-composition
+  - foundations/rules-of-react
 react_baseline: "19.2"
 status:
   drafted: true

@@ -3,10 +3,10 @@ article_id: jsx-and-rendering
 concept_folder: foundations
 wave: 1
 related:
-  - thinking-in-react
-  - components-and-props
-  - how-react-renders
-  - rendering-lists-and-keys
+  - foundations/thinking-in-react
+  - foundations/components-and-props
+  - rendering/how-react-renders
+  - rendering/rendering-lists-and-keys
 react_baseline: "19.2"
 status:
   drafted: true

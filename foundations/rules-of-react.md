@@ -3,11 +3,11 @@ article_id: rules-of-react
 concept_folder: foundations
 wave: 1
 related:
-  - thinking-in-react
-  - state-and-usestate
-  - effects-and-synchronization
-  - memoization-and-the-compiler
-  - react-compiler-deep-dive
+  - foundations/thinking-in-react
+  - state/state-and-usestate
+  - effects/effects-and-synchronization
+  - rendering/memoization-and-the-compiler
+  - rendering/react-compiler-deep-dive
 react_baseline: "19.2"
 status:
   drafted: true

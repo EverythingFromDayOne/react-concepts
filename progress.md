@@ -47,9 +47,9 @@ Waves gate delivery: finish a wave before starting the next. Approval checkpoint
 | 14 | `state/usereducer-and-state-structure.md` | 🟢 | Derive-don't-mirror lives here |
 | 15 | `effects/custom-hooks.md` | 🟢 | |
 | 16 | `rendering/memoization-and-the-compiler.md` | 🟢 | Compiler-first stance. Opus tier |
-| 17 | `rendering/error-boundaries.md` | ⚪ | The one class use-case; `react-error-boundary` in practice |
-| 18 | `rendering/portals-and-the-event-system.md` | ⚪ | |
-| 19 | `effects/escape-hatches-audit.md` | ⚪ | `useSyncExternalStore`, `useLayoutEffect`, `flushSync` |
+| 17 | `rendering/error-boundaries.md` | 🟢 | The one class use-case; `react-error-boundary` in practice |
+| 18 | `rendering/portals-and-the-event-system.md` | 🟢 | |
+| 19 | `effects/escape-hatches-audit.md` | 🟢 | `useSyncExternalStore`, `useLayoutEffect`, `flushSync` |
 
 ---
 
@@ -65,6 +65,12 @@ Starts once Wave 1 articles are complete, then runs in parallel with Waves 2–4
 | 2 | `recipes/performance/typing-lag-rerender-storm.md` | 🟢 | Controlled input in a 300-row dashboard; 180ms per keystroke. Fix arc: colocation → composition → Compiler verification. Deliberately not "sprinkle useMemo" |
 | 3 | `recipes/forms-and-ux/double-submit-and-optimistic-like.md` | 🟢 | Two orders from a double-click; Like count flickers back on failure. Fix arc: form actions + `useActionState` → `useOptimistic` with rollback |
 
+### Recipe #4 — state-management track opener
+
+| # | Recipe | Status | Scenario |
+| --- | --- | --- | --- |
+| 4 | `recipes/state-management/context-rerenders-the-whole-tree.md` | 🟢 | 200-card product grid; megacontext bundling cart/wishlist/filters re-renders all 200 cards on any change, 220ms/interaction, INP 90ms→310ms. Fix arc: split by change cadence → leaf-extraction → honest structural ceiling + `useSyncExternalStore` escalation variation |
+
 ### Queued recipe candidates by track
 
 | Track | Candidates |
@@ -72,7 +78,7 @@ Starts once Wave 1 articles are complete, then runs in parallel with Waves 2–4
 | `data-fetching/` | Duplicate requests on StrictMode double-mount; request waterfall from nested components; spinner never resolves after unmount |
 | `performance/` | 900KB initial bundle (route splitting); 6s freeze on tab switch (virtualization); LCP regression from client-only rendering |
 | `forms-and-ux/` | Validation fires on first keystroke; debounced search with loading states; multi-step wizard state survival |
-| `state-management/` | Server data cached in Zustand goes stale; context re-renders the whole tree; prop drilling 6 levels deep |
+| `state-management/` | Server data cached in Zustand goes stale; prop drilling 6 levels deep |
 | `auth/` | Refresh storm on 401; flash of protected content before redirect; logout leaves stale query cache |
 | `routing/` | Back button loses scroll position; lazy route flashes blank; URL params out of sync with component state |
 | `testing/` | Flaky `waitFor` tests; `act()` warnings; MSW handler leaks between tests |
@@ -206,4 +212,4 @@ Show old vs new patterns side by side with the marker comment:
 ## Session log
 
 - **Session 1 (July 2026):** roadmap approved; README/progress scaffolded; **Wave 1 complete** (articles 1–10, ~4,300 lines); **locked recipe trio complete** (search-race-condition, typing-lag-rerender-storm, double-submit-and-optimistic-like, ~875 lines); template v2 depth revision + coverage-bar reframe locked mid-session; session closed with `handoff-session-2.md` (ownership map + forward-reference debt registry). Next session opens Wave 2 with `rendering/how-react-renders.md`.
-- **Session 2 (July 2026):** Wave 2 opened — `rendering/how-react-renders.md` (480 lines, Opus tier), `effects/useref-and-the-dom.md` (536 lines), `state/context.md` (397 lines), `state/usereducer-and-state-structure.md` (433 lines), `effects/custom-hooks.md` (385 lines), `rendering/memoization-and-the-compiler.md` (356 lines, Opus tier) delivered.
+- **Session 2 (July 2026):** **Wave 2 complete** — `rendering/how-react-renders.md` (480 lines, Opus tier), `effects/useref-and-the-dom.md` (536 lines), `state/context.md` (397 lines), `state/usereducer-and-state-structure.md` (433 lines), `effects/custom-hooks.md` (385 lines), `rendering/memoization-and-the-compiler.md` (356 lines, Opus tier), `rendering/error-boundaries.md` (364 lines), `rendering/portals-and-the-event-system.md` (356 lines), `effects/escape-hatches-audit.md` (390 lines) delivered. All 19 articles (articles 11–19) drafted. **State-management recipe track opened** — `recipes/state-management/context-rerenders-the-whole-tree.md` (218 lines) delivered, closing the recipe-interleave debt. Session closed with `handoff-session-3.md` (full ownership map, articles 1–19 + recipe 4; Wave 3 debt registry). Next session opens Wave 3 with `concurrent/concurrent-rendering.md`.

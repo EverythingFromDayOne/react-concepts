@@ -9,7 +9,9 @@ related:
   - foundations/thinking-in-react
   - concurrent/actions
 react_baseline: "19.2"
-status: { drafted: true, reviewed: false }
+status:
+  drafted: true
+  reviewed: false
 ---
 
 # useReducer and State Structure

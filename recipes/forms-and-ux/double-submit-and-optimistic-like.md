@@ -1,7 +1,13 @@
 ---
 recipe_id: double-submit-and-optimistic-like
 track: forms-and-ux
-primary_concept: actions
+primary_concept: concurrent/actions
+related:
+  - forms/forms-controlled-and-uncontrolled
+  - foundations/thinking-in-react
+  - state/state-and-usestate
+  - ecosystem/data-fetching-tanstack-query
+  - recipes/data-fetching/search-race-condition
 difficulty: foundational
 react_baseline: "19.2"
 status:

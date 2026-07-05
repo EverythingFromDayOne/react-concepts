@@ -3,10 +3,10 @@ article_id: conditional-rendering-and-events
 concept_folder: foundations
 wave: 1
 related:
-  - jsx-and-rendering
-  - state-and-usestate
-  - rendering-lists-and-keys
-  - effects-and-synchronization
+  - foundations/jsx-and-rendering
+  - state/state-and-usestate
+  - rendering/rendering-lists-and-keys
+  - effects/effects-and-synchronization
 react_baseline: "19.2"
 status:
   drafted: true

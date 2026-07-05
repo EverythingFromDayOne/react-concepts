@@ -3,11 +3,11 @@ article_id: effects-and-synchronization
 concept_folder: effects
 wave: 1
 related:
-  - state-and-usestate
-  - thinking-in-react
-  - conditional-rendering-and-events
-  - useref-and-the-dom
-  - escape-hatches-audit
+  - state/state-and-usestate
+  - foundations/thinking-in-react
+  - foundations/conditional-rendering-and-events
+  - effects/useref-and-the-dom
+  - effects/escape-hatches-audit
 react_baseline: "19.2"
 status:
   drafted: true

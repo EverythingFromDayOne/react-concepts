@@ -3,11 +3,11 @@ article_id: component-composition
 concept_folder: foundations
 wave: 1
 related:
-  - components-and-props
-  - thinking-in-react
-  - context
-  - custom-hooks
-  - memoization-and-the-compiler
+  - foundations/components-and-props
+  - foundations/thinking-in-react
+  - state/context
+  - effects/custom-hooks
+  - rendering/memoization-and-the-compiler
 react_baseline: "19.2"
 status:
   drafted: true

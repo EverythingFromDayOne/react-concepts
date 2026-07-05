@@ -9,7 +9,9 @@ related:
   - foundations/rules-of-react
   - rendering/memoization-and-the-compiler
 react_baseline: "19.2"
-status: { drafted: true, reviewed: false }
+status:
+  drafted: true
+  reviewed: false
 ---
 
 # How React Renders

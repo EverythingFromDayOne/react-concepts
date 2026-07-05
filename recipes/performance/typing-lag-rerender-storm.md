@@ -1,7 +1,13 @@
 ---
 recipe_id: typing-lag-rerender-storm
 track: performance
-primary_concept: component-composition
+primary_concept: foundations/component-composition
+related:
+  - foundations/components-and-props
+  - foundations/rules-of-react
+  - rendering/memoization-and-the-compiler
+  - concurrent/concurrent-rendering
+  - recipes/data-fetching/search-race-condition
 difficulty: foundational
 react_baseline: "19.2"
 status:
@@ -254,7 +260,7 @@ Same symptom, different flame: scripting is modest but *style/layout* dominates 
 - [`../../foundations/component-composition.md`](../../foundations/component-composition.md) — the two moves and the owner/parent mechanics this entire fix runs on
 - [`../../foundations/components-and-props.md`](../../foundations/components-and-props.md) — `Object.is`, children-defeat-memo: why sprinkled `memo` loses
 - [`../../foundations/rules-of-react.md`](../../foundations/rules-of-react.md) — the enforcement stack that stage 3's verification is an application of
-- [`../../rendering/memoization-and-the-compiler.md`](../../rendering/memoization-and-the-compiler.md) *(Wave 2)* — bailout diagnostics and the manual-memo boundary, in full
+- [`../../rendering/memoization-and-the-compiler.md`](../../rendering/memoization-and-the-compiler.md) — bailout diagnostics and the manual-memo boundary, in full
 - [`../../concurrent/concurrent-rendering.md`](../../concurrent/concurrent-rendering.md) *(Wave 3)* — priorities and interruption behind `useDeferredValue`
 - [`../data-fetching/search-race-condition.md`](../data-fetching/search-race-condition.md) — the sibling recipe: where debounce *does* belong, and the union/tagging discipline shared by both
 - [`../../ecosystem/performance-profiling.md`](../../ecosystem/performance-profiling.md) *(Wave 4)* — the measurement workflow stage 1 compresses

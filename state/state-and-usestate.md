@@ -3,10 +3,10 @@ article_id: state-and-usestate
 concept_folder: state
 wave: 1
 related:
-  - thinking-in-react
-  - usereducer-and-state-structure
-  - effects-and-synchronization
-  - rendering-lists-and-keys
+  - foundations/thinking-in-react
+  - state/usereducer-and-state-structure
+  - effects/effects-and-synchronization
+  - rendering/rendering-lists-and-keys
 react_baseline: "19.2"
 status:
   drafted: true

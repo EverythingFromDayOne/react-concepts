@@ -9,7 +9,9 @@ related:
   - state/usereducer-and-state-structure
   - ecosystem/state-management-landscape
 react_baseline: "19.2"
-status: { drafted: true, reviewed: false }
+status:
+  drafted: true
+  reviewed: false
 ---
 
 # Context

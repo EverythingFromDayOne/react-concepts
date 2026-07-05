@@ -9,7 +9,9 @@ related:
   - foundations/component-composition
   - effects/custom-hooks
 react_baseline: "19.2"
-status: { drafted: true, reviewed: false }
+status:
+  drafted: true
+  reviewed: false
 ---
 
 # useRef and the DOM

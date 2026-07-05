@@ -1,7 +1,13 @@
 ---
 recipe_id: search-race-condition
 track: data-fetching
-primary_concept: effects-and-synchronization
+primary_concept: effects/effects-and-synchronization
+related:
+  - foundations/thinking-in-react
+  - effects/custom-hooks
+  - forms/forms-controlled-and-uncontrolled
+  - recipes/performance/typing-lag-rerender-storm
+  - recipes/forms-and-ux/double-submit-and-optimistic-like
 difficulty: foundational
 react_baseline: "19.2"
 status:
@@ -289,8 +295,8 @@ Add a page selector and the race dimension doubles: query changes *and* page cha
 - [`../../foundations/thinking-in-react.md`](../../foundations/thinking-in-react.md) — discriminated-union state, the tool that made the race visible
 - [`../../effects/custom-hooks.md`](../../effects/custom-hooks.md) — where `useDebouncedValue` graduates to, and the extraction rules it should follow
 - [`../../forms/forms-controlled-and-uncontrolled.md`](../../forms/forms-controlled-and-uncontrolled.md) — the input side: controlled typing, submit-mode variation
-- [`../forms-and-ux/double-submit-and-optimistic-like.md`](../forms-and-ux/double-submit-and-optimistic-like.md) *(planned)* — the first-wins policy this recipe's table defers to
-- [`../performance/typing-lag-rerender-storm.md`](../performance/typing-lag-rerender-storm.md) *(planned)* — the sibling failure: when the keystrokes themselves are the bottleneck
+- [`../forms-and-ux/double-submit-and-optimistic-like.md`](../forms-and-ux/double-submit-and-optimistic-like.md) — the first-wins policy this recipe's table defers to
+- [`../performance/typing-lag-rerender-storm.md`](../performance/typing-lag-rerender-storm.md) — the sibling failure: when the keystrokes themselves are the bottleneck
 - [`../../ecosystem/data-fetching-tanstack-query.md`](../../ecosystem/data-fetching-tanstack-query.md) *(Wave 4)* — the handover target, in full
 
 ## References

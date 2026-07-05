@@ -3,10 +3,10 @@ article_id: thinking-in-react
 concept_folder: foundations
 wave: 1
 related:
-  - jsx-and-rendering
-  - state-and-usestate
-  - how-react-renders
-  - rules-of-react
+  - foundations/jsx-and-rendering
+  - state/state-and-usestate
+  - rendering/how-react-renders
+  - foundations/rules-of-react
 react_baseline: "19.2"
 status:
   drafted: true

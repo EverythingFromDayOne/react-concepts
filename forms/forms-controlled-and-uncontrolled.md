@@ -3,11 +3,11 @@ article_id: forms-controlled-and-uncontrolled
 concept_folder: forms
 wave: 1
 related:
-  - state-and-usestate
-  - conditional-rendering-and-events
-  - components-and-props
-  - actions
-  - forms-at-scale
+  - state/state-and-usestate
+  - foundations/conditional-rendering-and-events
+  - foundations/components-and-props
+  - concurrent/actions
+  - forms/forms-at-scale
 react_baseline: "19.2"
 status:
   drafted: true

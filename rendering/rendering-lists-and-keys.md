@@ -3,10 +3,10 @@ article_id: rendering-lists-and-keys
 concept_folder: rendering
 wave: 1
 related:
-  - thinking-in-react
-  - jsx-and-rendering
-  - state-and-usestate
-  - how-react-renders
+  - foundations/thinking-in-react
+  - foundations/jsx-and-rendering
+  - state/state-and-usestate
+  - rendering/how-react-renders
 react_baseline: "19.2"
 status:
   drafted: true
