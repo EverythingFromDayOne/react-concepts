@@ -97,7 +97,7 @@ Dense cross-referencing is a locked philosophy (composition IS content). Expecte
 
 ---
 
-## Phase 1c — advanced + ecosystem articles (⚪ queued)
+## Phase 1c — advanced + ecosystem articles (🟡 in progress — Wave 3 complete)
 
 ### Wave 3 — Advanced
 
@@ -105,11 +105,11 @@ Dense cross-referencing is a locked philosophy (composition IS content). Expecte
 | --- | --- | --- | --- |
 | 20 | `concurrent/concurrent-rendering.md` | 🟢 | Transitions, `useDeferredValue`, tearing. Opus tier |
 | 21 | `concurrent/suspense.md` | 🟢 | Pending-is-a-boundary; ErrorBoundary-outside/Suspense-inside triad; stale-chunk reset |
-| 22 | `concurrent/use-and-promises.md` | ⚪ | |
-| 23 | `concurrent/actions.md` | ⚪ | The 19 mutation story; pairs with the double-submit recipe |
-| 24 | `rendering/react-compiler-deep-dive.md` | ⚪ | Includes the Vite 8 / `@rolldown/plugin-babel` wiring gotcha. Opus tier |
-| 25 | `server/ssr-and-hydration.md` | ⚪ | Framework-agnostic fundamentals. Opus tier |
-| 26 | `server/server-components.md` | ⚪ | The RSC model. Opus tier |
+| 22 | `concurrent/use-and-promises.md` | 🟢 | Full `use()` mechanics; conditional reads escape the hook-order rule; stable-promise rule |
+| 23 | `concurrent/actions.md` | 🟢 | `useActionState` = reducer productized; `useFormStatus`/`useOptimistic` internals; pairs with double-submit recipe |
+| 24 | `rendering/react-compiler-deep-dive.md` | 🟢 | Vite 8 `@rolldown/plugin-babel` wiring gotcha paid off; reactive scopes traced; full opt-in/out accounting. Opus tier |
+| 25 | `server/ssr-and-hydration.md` | 🟢 | Two-render contract, hydration algorithm + mismatch mechanics, `getServerSnapshot`/`useLayoutEffect` SSR, error pipeline. Opus tier |
+| 26 | `server/server-components.md` | 🟢 | The RSC model: server/client boundary, serialization (data-not-behavior), module-split zero-bundle, RSC≠SSR. Opus tier |
 
 ### Wave 4 — Ecosystem
 
@@ -213,4 +213,4 @@ Show old vs new patterns side by side with the marker comment:
 
 - **Session 1 (July 2026):** roadmap approved; README/progress scaffolded; **Wave 1 complete** (articles 1–10, ~4,300 lines); **locked recipe trio complete** (search-race-condition, typing-lag-rerender-storm, double-submit-and-optimistic-like, ~875 lines); template v2 depth revision + coverage-bar reframe locked mid-session; session closed with `handoff-session-2.md` (ownership map + forward-reference debt registry). Next session opens Wave 2 with `rendering/how-react-renders.md`.
 - **Session 2 (July 2026):** **Wave 2 complete** — `rendering/how-react-renders.md` (480 lines, Opus tier), `effects/useref-and-the-dom.md` (536 lines), `state/context.md` (397 lines), `state/usereducer-and-state-structure.md` (433 lines), `effects/custom-hooks.md` (385 lines), `rendering/memoization-and-the-compiler.md` (356 lines, Opus tier), `rendering/error-boundaries.md` (364 lines), `rendering/portals-and-the-event-system.md` (356 lines), `effects/escape-hatches-audit.md` (390 lines) delivered. All 19 articles (articles 11–19) drafted. **State-management recipe track opened** — `recipes/state-management/context-rerenders-the-whole-tree.md` (218 lines) delivered, closing the recipe-interleave debt. Session closed with `handoff-session-3.md` (full ownership map, articles 1–19 + recipe 4; Wave 3 debt registry). Next session opens Wave 3 with `concurrent/concurrent-rendering.md`.
-- **Session 3 (July 2026) — in progress:** **Wave 3 opened.** `concurrent/concurrent-rendering.md` (430 lines, Opus tier) delivered — the split-lane search walkthrough, full interruption + tearing trace, `useTransition`/`useDeferredValue`/`startTransition`, scheduling-lag-vs-wall-clock-lag against debounce. Pays off both how-react-renders trailers (transition mechanics + tearing; search/table split-lane) and the usereducer/custom-hooks deferral debts. Leans on React 19.2 Performance Tracks as the concurrent-rendering verification tool; `<Activity>` introduced in the evolution section. `concurrent/suspense.md` (~340 lines) delivered — loading-is-a-boundary, throw-a-thenable/retry mechanics, the transition-holds-content interplay, reveal throttling (+ SuspenseList-not-stable honesty note), the loading/error/success triad (ErrorBoundary outside, Suspense inside), and the stale-chunk reset. Pays off error-boundaries' pairing promise (`use()` rejections + `lazy` failures as errors-as-thrown) and the Suspense-side half of the stale-chunk boundary. `use()` mechanics fenced to article 22. Next up: `concurrent/use-and-promises.md`.
+- **Session 3 (July 2026):** **Wave 3 complete** — all 7 advanced articles drafted (4 Opus): `concurrent/concurrent-rendering.md` (~430, Opus), `concurrent/suspense.md` (~340), `concurrent/use-and-promises.md` (~300), `concurrent/actions.md` (~350), `rendering/react-compiler-deep-dive.md` (~310, Opus), `server/ssr-and-hydration.md` (~330, Opus), `server/server-components.md` (~300, Opus). Every Wave 1–2 forward-reference debt into Wave 3 paid off: transition mechanics + tearing + the split-lane walkthrough and the scheduling-lag-vs-wall-clock-lag line (20); the Suspense/ErrorBoundary triad + stale-chunk Suspense half (21); full `use()` mechanics + conditional reads escaping the hook-order rule + the stable-promise rule (22); `useActionState`/`useFormStatus`/`useOptimistic` as the reducer productized (23); the Vite 8 `@rolldown/plugin-babel` wiring gotcha + `"use no memo"` accounting depth (24, tooling web-verified); `getServerSnapshot`/`useLayoutEffect`-SSR + the SSR error pipeline + `window`/`navigator` guards (25); the RSC model as scoped (26). **README refreshed** to current state (recipes landed not planned, +4th recipe, phase statuses, working article links). **Recipe interleave still open** — `data-fetching/strictmode-double-mount` dedup remains the single most overdue candidate (writable since article 9). Session closed with `handoff-session-4.md` (opens Wave 4 ecosystem, articles 27–36). Next session opens Wave 4 with `ecosystem/data-fetching-tanstack-query.md` (or the overdue StrictMode recipe first — Huy's call).

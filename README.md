@@ -7,7 +7,7 @@ A modern, opinionated React learning resource — original English-language cont
 ## Where to start
 
 - **New to React** → `foundations/thinking-in-react.md`, then follow the reading order in [`roadmap.md`](roadmap.md)
-- **Existing React dev** → pick a concept article (`effects-and-synchronization`, `memoization-and-the-compiler`, `actions`) or jump straight to a recipe that matches a real-world problem you're hitting
+- **Existing React dev** → pick a concept article (`effects-and-synchronization`, `memoization-and-the-compiler`, `concurrent-rendering`) or jump straight to a recipe that matches a real-world problem you're hitting
 - **Looking for a specific bug fix** → `recipes/` is organized by problem domain; the recipes lead with the symptom
 
 ## Structure
@@ -47,22 +47,23 @@ docs/
 
 ## Recipes index — quick lookup by symptom
 
-The index below grows as recipes land. First three in the pipeline:
+The index below grows as recipes land. Landed so far:
 
 | Problem | Recipe |
 | --- | --- |
-| "User types fast — stale search results overwrite the fresh ones" | `data-fetching/search-race-condition` *(planned)* |
-| "Typing in one input lags — every keystroke re-renders a 300-row table" | `performance/typing-lag-rerender-storm` *(planned)* |
-| "User clicks Buy, nothing happens for 800ms, clicks again — two orders" | `forms-and-ux/double-submit-and-optimistic-like` *(planned)* |
+| "User types fast — stale search results overwrite the fresh ones" | [`data-fetching/search-race-condition`](recipes/data-fetching/search-race-condition.md) |
+| "Typing in one input lags — every keystroke re-renders a 300-row table" | [`performance/typing-lag-rerender-storm`](recipes/performance/typing-lag-rerender-storm.md) |
+| "User clicks Buy, nothing happens for 800ms, clicks again — two orders" | [`forms-and-ux/double-submit-and-optimistic-like`](recipes/forms-and-ux/double-submit-and-optimistic-like.md) |
+| "Changing one value in context re-renders all 200 cards in the grid" | [`state-management/context-rerenders-the-whole-tree`](recipes/state-management/context-rerenders-the-whole-tree.md) |
 
 ## Phases
 
 | Phase | Status | Description |
 | --- | --- | --- |
 | Roadmap | 🟢 Drafted | Versions, meta-framework stance, priorities, locked conventions |
-| Phase 1a | ⚪ Queued | Foundation concept articles (Waves 1–2, 19 articles) |
-| Phase 1b | ⚪ Queued | Recipes — starts once Wave 1 is complete, then runs in parallel |
-| Phase 1c | ⚪ Queued | Advanced + ecosystem articles (Waves 3–4, 17 articles) |
+| Phase 1a | 🟢 Drafted | Foundation concept articles (Waves 1–2) — all 19 drafted, awaiting review |
+| Phase 1b | 🟡 In progress | Recipes — 4 drafted, running in parallel with later waves |
+| Phase 1c | 🟡 In progress | Advanced + ecosystem articles (Waves 3–4, 17 articles) — Wave 3 underway |
 | Phase 2 | ⚪ Deferred | Bridge layer for developers arriving from other frameworks — additive only |
 
 See [`progress.md`](progress.md) for detailed status.
