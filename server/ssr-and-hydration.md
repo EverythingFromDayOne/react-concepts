@@ -177,7 +177,7 @@ The cost is one extra client render and a possible flash from `false`→`true`; 
 
 ### Pattern 2 — `useSyncExternalStore` with `getServerSnapshot`
 
-When the browser value is needed *at render time* and comes from an external source (viewport, media query, `localStorage`, connection status), the right tool is `useSyncExternalStore` — [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore) owns its `subscribe`/`getSnapshot` invariants and the tearing problem it solves. What this article owns is its **third argument, `getServerSnapshot`**, which exists precisely for SSR:
+When the browser value is needed *at render time* and comes from an external source (viewport, media query, `localStorage`, connection status), the right tool is `useSyncExternalStore` — [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore--subscribing-to-external-state-safely) owns its `subscribe`/`getSnapshot` invariants and the tearing problem it solves. What this article owns is its **third argument, `getServerSnapshot`**, which exists precisely for SSR:
 
 ```tsx
 import { useSyncExternalStore } from "react";
@@ -224,7 +224,7 @@ The streaming render exposes staged error callbacks (on `renderToPipeableStream`
 - **`onError`** — fires for *every* error during streaming, for logging. React distinguishes **recoverable** errors (it streamed a fallback and the client will retry) from fatal ones. This is your logging hook; most streaming errors that hit it are recoverable.
 - **Suspense-boundary errors during streaming.** If a component inside a Suspense boundary errors *after* the shell has already flushed, React can't un-send the HTML — so it streams instructions telling the client to switch that boundary to client rendering and retry there. The error becomes recoverable: the server gave up on that boundary, the client re-renders it, and if it errors again on the client, the client error boundary catches it. This is the streaming-side of the stale-chunk / boundary-retry story [`suspense`](../concurrent/suspense.md) and [`error-boundaries`](../rendering/error-boundaries.md) set up.
 
-On the client, `hydrateRoot` takes the root error options [`error-boundaries`](../rendering/error-boundaries.md#the-19-root-error-options) owns — `onRecoverableError`, `onCaughtError`, `onUncaughtError`. In the SSR context, `onRecoverableError` is the one that fires most: it's called when React recovers from a hydration mismatch (by client-rendering the subtree) or completes a server-initiated boundary retry. Wire it to your telemetry — a spike in recoverable errors is usually a hydration-mismatch bug leaking SSR performance, even though nothing is visibly broken.
+On the client, `hydrateRoot` takes the root error options [`error-boundaries`](../rendering/error-boundaries.md#react-19s-root-level-reporting) owns — `onRecoverableError`, `onCaughtError`, `onUncaughtError`. In the SSR context, `onRecoverableError` is the one that fires most: it's called when React recovers from a hydration mismatch (by client-rendering the subtree) or completes a server-initiated boundary retry. Wire it to your telemetry — a spike in recoverable errors is usually a hydration-mismatch bug leaking SSR performance, even though nothing is visibly broken.
 
 ## Real-world patterns
 
@@ -265,7 +265,7 @@ function ClientOnly({ children }: { children: React.ReactNode }) {
 
 **3. Non-deterministic render output.** `Date.now()`, `Math.random()`, `new Date().toLocaleString()` (timezone/locale differ server vs client) all produce different HTML on each side → mismatch. Compute deterministically, mark the node with `suppressHydrationWarning` if the divergence is intended, or render a stable value and update after mount.
 
-**4. Invalid HTML nesting.** A `<div>` inside a `<p>`, or a `<p>` inside a `<p>`: the browser auto-corrects the server HTML into valid structure ([`jsx-and-rendering`](../foundations/jsx-and-rendering.md#browser-markup-auto-correction)), so the DOM no longer matches what React expects to hydrate → mismatch. Emit valid HTML.
+**4. Invalid HTML nesting.** A `<div>` inside a `<p>`, or a `<p>` inside a `<p>`: the browser auto-corrects the server HTML into valid structure ([`jsx-and-rendering`](../foundations/jsx-and-rendering.md#one-more-dom-reality-the-browser-edits-your-markup)), so the DOM no longer matches what React expects to hydrate → mismatch. Emit valid HTML.
 
 **5. `useLayoutEffect` for server-relevant layout.** It doesn't run on the server, so the first frame lacks the measurement → warning and flash. Move to `useEffect`, use `getServerSnapshot` for render-time values, or mount-gate the measured content.
 

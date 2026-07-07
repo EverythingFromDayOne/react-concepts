@@ -36,7 +36,7 @@ The discipline this article teaches is a loop: **baseline → change exactly one
 
 React ships three builds. The default **development** build is instrumented for warnings and is slow — its absolute timings are meaningless for optimization decisions, though its *relative* comparisons and its "why did this render" reasons are trustworthy. The default **production** build has profiling instrumentation stripped out entirely. Between them sits a dedicated **profiling** build: production semantics plus the timing hooks, imported by swapping `react-dom/client` for `react-dom/profiling` (framework build flags like `next build --profile` do this for you). Rule of thumb: reach for the profiling build any time you quote an absolute millisecond number as evidence.
 
-The instrumentation works by hooking React's **commit phase** (the render/commit split is owned by [how React renders](../rendering/how-react-renders.md#render-and-commit)). Every time a subtree commits, React records how long the render took and hands it to two consumers: the DevTools extension, and any `<Profiler>` you have mounted. That single commit hook is why the DevTools flamegraph and the `<Profiler>` `onRender` callback report the same `actualDuration` — they are two faces of one measurement.
+The instrumentation works by hooking React's **commit phase** (the render/commit split is owned by [how React renders](../rendering/how-react-renders.md#how-it-works-under-the-hood)). Every time a subtree commits, React records how long the render took and hands it to two consumers: the DevTools extension, and any `<Profiler>` you have mounted. That single commit hook is why the DevTools flamegraph and the `<Profiler>` `onRender` callback report the same `actualDuration` — they are two faces of one measurement.
 
 `actualDuration` is the time actually spent rendering the subtree this commit, *with* whatever memoization was in effect. `baseDuration` is React's estimate of what the same subtree would have cost with **no** memoization at all — the worst case, computed by summing each component's most recent standalone render time. The relationship between them is the whole game: if `actualDuration` on an update is far below `baseDuration`, memoization (manual or Compiler-inserted) is doing real work; if `actualDuration` sits *at* `baseDuration` every commit, nothing is being skipped and your memoization — if you added any — is inert.
 
@@ -242,7 +242,7 @@ INP ≈ 342ms — **poor** (the good/poor line is 200ms/500ms). The attribution 
 
 ### Step 4 — Apply exactly one change
 
-Split the update into two priorities: the input value updates synchronously (stays on the Blocking lane, so typing feels instant), and the filtered result is a *deferred* value that React is free to compute at Transition priority. The mechanism — `useDeferredValue`, transitions, tearing — is owned by [concurrent rendering](../concurrent/concurrent-rendering.md#usedeferredvalue); here we only wire it and measure it.
+Split the update into two priorities: the input value updates synchronously (stays on the Blocking lane, so typing feels instant), and the filtered result is a *deferred* value that React is free to compute at Transition priority. The mechanism — `useDeferredValue`, transitions, tearing — is owned by [concurrent rendering](../concurrent/concurrent-rendering.md#usedeferredvalue--when-you-receive-a-value-you-dont-set); here we only wire it and measure it.
 
 ```tsx
 // ProductDashboard.tsx — one change
@@ -302,7 +302,7 @@ Open the DevTools **Components** tab and select `ProductRow`. With the React Com
 
 **Did the transition actually help?** The only honest answer comes from the Scheduler track. A transition that "feels" faster but still shows its work on the **Blocking** subtrack didn't take — usually because the state update wasn't inside `startTransition`/`useDeferredValue`, or because a synchronous read forced it back to blocking priority. The classic miss: wrapping the *table* update in a transition but leaving the *input* value update blocking is right; wrapping the *input* value in the transition makes typing itself lag. The track tells you which you did.
 
-**Did the Compiler actually help?** Two checks. In the **Components** panel, compiled components carry the ✨ badge — a component you expected to be optimized that lacks the badge means the Compiler bailed (a rules-of-React violation is the usual cause; the [compiler deep dive](../rendering/react-compiler-deep-dive.md#bailouts) owns the why). In the **Profiler**, compare `actualDuration` to `baseDuration` on updates: a healthy compiled tree shows `actualDuration` dropping well below `baseDuration` as unchanged subtrees skip. If they track each other commit-for-commit, nothing is being memoized and you have a bailout to chase — *not* a reason to hand-add `memo`.
+**Did the Compiler actually help?** Two checks. In the **Components** panel, compiled components carry the ✨ badge — a component you expected to be optimized that lacks the badge means the Compiler bailed (a rules-of-React violation is the usual cause; the [compiler deep dive](../rendering/react-compiler-deep-dive.md#the-soundness-contract-bail-dont-miscompile) owns the why). In the **Profiler**, compare `actualDuration` to `baseDuration` on updates: a healthy compiled tree shows `actualDuration` dropping well below `baseDuration` as unchanged subtrees skip. If they track each other commit-for-commit, nothing is being memoized and you have a bailout to chase — *not* a reason to hand-add `memo`.
 
 **Profiling in production.** The DevTools Profiler is dev-only, but real-user numbers come from a profiling build feeding `<Profiler>` `onRender` to your observability stack — sample it (log only `actualDuration > 16`) so the overhead and the data volume stay sane.
 
@@ -426,9 +426,9 @@ Profiling is the discipline that earns you the right to optimize. Measure at two
 ## See also
 
 - [Memoization and the Compiler](../rendering/memoization-and-the-compiler.md) — the mechanism this article verifies; where manual `memo` still legitimately lives.
-- [React Compiler deep dive](../rendering/react-compiler-deep-dive.md#bailouts) — why the ✨ badge is missing, and how to read a bailout.
-- [Concurrent rendering](../concurrent/concurrent-rendering.md#usedeferredvalue) — transitions and `useDeferredValue`, the mechanism behind the walkthrough's fix.
-- [How React renders](../rendering/how-react-renders.md#render-and-commit) — the render/commit split the Profiler instruments.
+- [React Compiler deep dive](../rendering/react-compiler-deep-dive.md#the-soundness-contract-bail-dont-miscompile) — why the ✨ badge is missing, and how to read a bailout.
+- [Concurrent rendering](../concurrent/concurrent-rendering.md#usedeferredvalue--when-you-receive-a-value-you-dont-set) — transitions and `useDeferredValue`, the mechanism behind the walkthrough's fix.
+- [How React renders](../rendering/how-react-renders.md#how-it-works-under-the-hood) — the render/commit split the Profiler instruments.
 - [Recipe: typing lag / rerender storm](../recipes/performance/typing-lag-rerender-storm.md) — the colocation-and-composition fix arc for render-cost problems; the hub of the performance recipe track.
 - [Recipe: 900KB initial bundle](../recipes/performance/route-splitting-bundle.md) *(planned)* — profiling load, not interaction.
 - [Recipe: 6s freeze on tab switch](../recipes/performance/virtualization-long-list.md) *(planned)* — when the fix is virtualization, not memoization.

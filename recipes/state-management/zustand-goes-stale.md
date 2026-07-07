@@ -8,6 +8,8 @@ related:
   - ecosystem/state-management-landscape
   - ecosystem/data-fetching-tanstack-query
   - state/context
+  - recipes/data-fetching/search-race-condition
+  - recipes/forms-and-ux/double-submit-and-optimistic-like
 status:
   drafted: true
   reviewed: false

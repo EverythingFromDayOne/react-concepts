@@ -39,7 +39,7 @@ The mental unlock: **loading is a boundary, not a prop.** You stop asking "is th
 
 ### Suspending is a throw, catching is a boundary
 
-When a component suspends, React doesn't get a return value — it gets a throw, structurally like the throw an error boundary catches (see [`error-boundaries`](../rendering/error-boundaries.md#unwind-mechanics) for the unwind machinery this reuses). But instead of a plain error, what's thrown is a **thenable**. React unwinds the fiber stack to the nearest `<Suspense>` boundary fiber, and that boundary switches which children it commits:
+When a component suspends, React doesn't get a return value — it gets a throw, structurally like the throw an error boundary catches (see [`error-boundaries`](../rendering/error-boundaries.md#the-unwind) for the unwind machinery this reuses). But instead of a plain error, what's thrown is a **thenable**. React unwinds the fiber stack to the nearest `<Suspense>` boundary fiber, and that boundary switches which children it commits:
 
 - Its **primary** children (the real subtree) are set aside — kept as pending work, not committed to the DOM.
 - Its **fallback** is committed instead.
@@ -188,7 +188,7 @@ export default function ActivityPanel({ feedPromise }: { feedPromise: Promise<Ac
 }
 ```
 
-Now there are **nested boundaries**: the outer one (Stage 1) catches the code suspension; the inner one catches the data suspension. The header paints the moment the chunk loads; the list fills in when the feed resolves. Boundary placement *is* the reveal design — this is the same placement-granularity ladder [`error-boundaries`](../rendering/error-boundaries.md#placement-granularity-ladder) describes for errors, applied to loading. One boundary at the top means one big spinner; granular boundaries mean progressive reveal.
+Now there are **nested boundaries**: the outer one (Stage 1) catches the code suspension; the inner one catches the data suspension. The header paints the moment the chunk loads; the list fills in when the feed resolves. Boundary placement *is* the reveal design — this is the same placement-granularity ladder [`error-boundaries`](../rendering/error-boundaries.md#placement-the-granularity-ladder) describes for errors, applied to loading. One boundary at the top means one big spinner; granular boundaries mean progressive reveal.
 
 ### Stage 3 — the error half (paying off the debt)
 
@@ -266,7 +266,7 @@ Type note: there is no "Suspense-aware" type distinction on a component — susp
 
 **3. Fallback that shifts layout.** A centered spinner replaced by a full data table jumps the page (CLS). Shape the fallback like the content it replaces.
 
-**4. Boundary placed too high.** One `<Suspense>` at the app root means the entire page flashes to a fallback whenever *any* descendant suspends — one slow widget blanks everything. Place boundaries at the granularity you want to reveal at (the placement ladder from [`error-boundaries`](../rendering/error-boundaries.md#placement-granularity-ladder)).
+**4. Boundary placed too high.** One `<Suspense>` at the app root means the entire page flashes to a fallback whenever *any* descendant suspends — one slow widget blanks everything. Place boundaries at the granularity you want to reveal at (the placement ladder from [`error-boundaries`](../rendering/error-boundaries.md#placement-the-granularity-ladder)).
 
 **5. Not using a transition for updates.** The default on a suspending *update* is to hide existing content and show the fallback — jarring on refresh/navigation. Wrap the update in `startTransition` to hold the current content and show `isPending` instead. Initial load → fallback; update → transition.
 
@@ -297,7 +297,7 @@ Type note: there is no "Suspense-aware" type distinction on a component — susp
 *Hint:* `resetKeys` / `resetErrorBoundary` from [`error-boundaries`](../rendering/error-boundaries.md#reset-design); a genuinely-gone chunk needs a reload, not just a retry.
 
 **3. (Stretch) Refresh without flashing.** Build a detail view with a refresh button. First without a transition — watch it blank to the skeleton on every refresh. Then wrap the refresh in `startTransition` and confirm the current content stays (dimmed) until the new data arrives.
-*Hint:* The Suspense fallback is for "nothing yet"; `isPending` is for "something better coming" ([`concurrent-rendering`](./concurrent-rendering.md#the-transition-interplay--holding-content-instead-of-flashing-a-spinner)).
+*Hint:* The Suspense fallback is for "nothing yet"; `isPending` is for "something better coming" ([`concurrent-rendering`](./concurrent-rendering.md#real-world-patterns)).
 
 ## Summary
 

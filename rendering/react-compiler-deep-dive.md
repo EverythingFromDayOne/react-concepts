@@ -33,7 +33,7 @@ The compiler runs as a Babel pass over each module. Conceptually it moves throug
 1. **Parse** your source to an AST (Babel's job).
 2. **Lower to an intermediate representation.** The compiler builds a control-flow graph of each component/hook in a High-level IR (HIR) in SSA-like form. This is what lets it reason about *order of operations* and *what depends on what* — things an AST alone doesn't make explicit.
 3. **Analyze.** Several passes run over the HIR (below): inferring which values are reactive, grouping code into memoizable scopes, computing each scope's exact dependencies, and tracking mutation so it never memoizes something unsafe.
-4. **Codegen.** The compiler re-emits JavaScript with a memo cache: it allocates cache slots (`_c(n)` — the traced output [`memoization-and-the-compiler`](./memoization-and-the-compiler.md#real-compile-output) already dissected) and wraps each scope in a "did these inputs change? if not, reuse the cached value" guard.
+4. **Codegen.** The compiler re-emits JavaScript with a memo cache: it allocates cache slots (`_c(n)` — the traced output [`memoization-and-the-compiler`](./memoization-and-the-compiler.md#what-compiled-output-actually-looks-like) already dissected) and wraps each scope in a "did these inputs change? if not, reuse the cached value" guard.
 
 The output is behaviorally identical to your source — same renders, same values — with recomputation skipped wherever the inputs are unchanged.
 
@@ -51,7 +51,7 @@ The project's recurring principle — **deps are derived, not chosen** — is ex
 
 Memoization is only safe if the compiler knows a value won't be mutated after it's cached. So the compiler tracks **mutation and aliasing**: where each value is written, and which references alias the same underlying object. Two payoffs:
 
-- **Local mutation of freshly-created values stays legal** — the "local-mutation-legal" carve-out from [`rules-of-react`](../foundations/rules-of-react.md#purity). Building an array with a `for` loop and `push` inside render is fine; the compiler sees the array is created and mutated locally, then never mutated after, and memoizes it correctly. The rule was never "no mutation ever" — it's "no mutation of values that escaped your scope," and the compiler models exactly that boundary.
+- **Local mutation of freshly-created values stays legal** — the "local-mutation-legal" carve-out from [`rules-of-react`](../foundations/rules-of-react.md#how-it-works-under-the-hood). Building an array with a `for` loop and `push` inside render is fine; the compiler sees the array is created and mutated locally, then never mutated after, and memoizes it correctly. The rule was never "no mutation ever" — it's "no mutation of values that escaped your scope," and the compiler models exactly that boundary.
 - **Scopes split where mutation demands.** If a later instruction mutates a value an earlier scope produced, the compiler adjusts scope boundaries so the memoization stays correct rather than caching a value that's about to change.
 
 ### The soundness contract: bail, don't miscompile
@@ -60,7 +60,7 @@ Here's the part that makes the whole thing trustworthy. The compiler's correctne
 
 The compiler's defense is a design principle worth internalizing: **when it cannot statically prove a component is safe to compile, it bails on that component — skips memoizing it — rather than compiling it and risking wrong behavior.** The bailout is *per component/hook*, not per app: one un-compilable component opts itself out while everything around it stays compiled. The result is conservative and safe: a rule violation almost always means "that component just didn't get optimized," not "your app broke."
 
-This is what a missing ✨ badge actually means. The badge ([`memoization-and-the-compiler`](./memoization-and-the-compiler.md#the-badge)) marks a compiled component. No badge means one of three things: it's not a component/hook (nothing to compile), it's excluded by config, or **the compiler detected something it couldn't safely compile and bailed**. The third case is the interesting one — and diagnosing it is exactly what the ESLint plugin is for. The compiler bails *silently* (that's the point — it degrades gracefully); lint is how you make the silence visible.
+This is what a missing ✨ badge actually means. The badge ([`memoization-and-the-compiler`](./memoization-and-the-compiler.md#walkthrough-the-verification-workflow-rung-3-end-to-end)) marks a compiled component. No badge means one of three things: it's not a component/hook (nothing to compile), it's excluded by config, or **the compiler detected something it couldn't safely compile and bailed**. The third case is the interesting one — and diagnosing it is exactly what the ESLint plugin is for. The compiler bails *silently* (that's the point — it degrades gracefully); lint is how you make the silence visible.
 
 ## Walkthrough: what the compiler does to a component
 
@@ -88,13 +88,13 @@ Manually, you'd reach for `useMemo` on `related`, maybe `useMemo` on `priceLabel
 
 - **It derives each scope's exact dependencies.** Not "everything the function closes over" — the *minimal* set. `related`'s scope depends on `product.category` and nothing else, so a change to `product.price` does **not** recompute the expensive related-lookup. A human writing `useMemo(() => expensiveRelatedLookup(product.category), [product])` would over-depend on the whole `product` object and recompute needlessly; the compiler derives `[product.category]` precisely. This is "deps are derived, not chosen" paying off in fewer wasted computations than careful manual code typically achieves.
 
-- **It guards each scope with a slot in the memo cache.** Codegen wraps each scope in a "did these specific deps change since last render? if not, reuse the cached value" check, backed by cache slots (`_c(n)` from `react/compiler-runtime` — [`memoization-and-the-compiler`](./memoization-and-the-compiler.md#real-compile-output) shows the exact emitted syntax; the point here is *which* scopes and *why*, which that article doesn't trace).
+- **It guards each scope with a slot in the memo cache.** Codegen wraps each scope in a "did these specific deps change since last render? if not, reuse the cached value" check, backed by cache slots (`_c(n)` from `react/compiler-runtime` — [`memoization-and-the-compiler`](./memoization-and-the-compiler.md#what-compiled-output-actually-looks-like) shows the exact emitted syntax; the point here is *which* scopes and *why*, which that article doesn't trace).
 
 Now watch a concrete re-render. The parent re-renders and passes a `product` whose `price` changed but whose `category` and `id` did not, with a stable `currency` and `onAddToCart`:
 
 - `priceLabel` scope: `product.price` changed → **recomputes**. (Correct — the price label is stale otherwise.)
 - `related` scope: `product.category` unchanged → **skips** the expensive lookup, reuses the cached list. (This is the win — the costly work is gated on the one input that actually feeds it.)
-- `handleAdd` scope: `onAddToCart` and `product.id` unchanged → **reuses the same function reference**. So `AddButton`, if it's compiled (or memoized), sees an identical `onClick` prop and can bail on its own re-render (bailout check 3, [`how-react-renders`](./how-react-renders.md#the-three-bailout-checks)) — the stable-reference problem `useCallback` existed to solve, handled without a `useCallback`.
+- `handleAdd` scope: `onAddToCart` and `product.id` unchanged → **reuses the same function reference**. So `AddButton`, if it's compiled (or memoized), sees an identical `onClick` prop and can bail on its own re-render (bailout check 3, [`how-react-renders`](./how-react-renders.md#bailouts-the-fast-paths)) — the stable-reference problem `useCallback` existed to solve, handled without a `useCallback`.
 
 The manual version needed three memo calls and three correct dependency arrays to achieve this, and would have quietly regressed the moment someone edited the body and forgot to update a dep array. The compiled version derives it all and stays correct across edits. To confirm it's actually happening rather than trusting the description, the ✨ badge marks `ProductPanel` as compiled, and the preset's `logger` will print a compile event for it — the verify-don't-assume discipline this whole article turns on.
 
@@ -136,7 +136,7 @@ A few things worth knowing so this doesn't bite you:
 - **The preset carries a file filter.** `reactCompilerPreset()` only runs the compiler on relevant source files, so you're not paying Babel over your whole `node_modules`. To exclude specific directories (a legacy folder you're not ready to compile), grab the preset and adjust its filter: `const preset = reactCompilerPreset(); preset.rolldown.filter.id.exclude = ["src/legacy/**"];`.
 - **Compiler-before-other-Babel-plugins.** If you add *other* Babel plugins alongside the compiler, the compiler must run first in the Babel plugin order — it needs the original source shape for its analysis. This is about ordering *within* the Babel preset, not about the Vite `plugins` array.
 - **The v5 escape hatch.** If you haven't moved to plugin-react v6 yet, v5 still works on Vite 8 and still accepts the old `react({ babel: {...} })` form — so "the old way" isn't wrong everywhere, just wrong on v6. Match your wiring to your plugin-react major version.
-- **Verify, don't assume.** After wiring, open React DevTools and confirm the ✨ badge on your components ([`memoization-and-the-compiler`](./memoization-and-the-compiler.md#the-badge)), or pass a `logger` to the preset to print compile events per file: `reactCompilerPreset({ logger: { logEvent(filename, event) { console.log(filename, event); } } })`. A silent no-op is the failure mode this whole section exists to prevent.
+- **Verify, don't assume.** After wiring, open React DevTools and confirm the ✨ badge on your components ([`memoization-and-the-compiler`](./memoization-and-the-compiler.md#walkthrough-the-verification-workflow-rung-3-end-to-end)), or pass a `logger` to the preset to print compile events per file: `reactCompilerPreset({ logger: { logEvent(filename, event) { console.log(filename, event); } } })`. A silent no-op is the failure mode this whole section exists to prevent.
 
 ## The ESLint plugin
 
@@ -172,7 +172,7 @@ Note the preset surface is evolving quickly (the plugin recently slimmed to `rec
 
 ## Opting in and out — the accounting
 
-[`memoization-and-the-compiler`](./memoization-and-the-compiler.md#use-no-memo) introduced `"use no memo"`. Here's the full accounting of the levers, from whole-project down to a single function.
+[`memoization-and-the-compiler`](./memoization-and-the-compiler.md#when-the-compiler-declines) introduced `"use no memo"`. Here's the full accounting of the levers, from whole-project down to a single function.
 
 ### Compilation mode (project-wide)
 
@@ -199,7 +199,7 @@ function OptedIn() {
 }
 ```
 
-`"use no memo"` is an **escape hatch, not a fix.** If a component misbehaves under compilation, the cause is almost always a Rules-of-React violation the compiler *should* have bailed on but a subtle case slipped through — and the honest response is to find and fix the violation (lint will usually name it), not to silence the compiler on that function and ship the impurity. Reserve `"use no memo"` for genuinely exceptional cases: a hot path you've hand-optimized in a way the compiler can't match, or a temporary unblock while you fix the real cause. Every `"use no memo"` should carry a comment explaining why, same discipline as a manual `memo` at a boundary ([`memoization-and-the-compiler`](./memoization-and-the-compiler.md#manual-memo-estate-table)).
+`"use no memo"` is an **escape hatch, not a fix.** If a component misbehaves under compilation, the cause is almost always a Rules-of-React violation the compiler *should* have bailed on but a subtle case slipped through — and the honest response is to find and fix the violation (lint will usually name it), not to silence the compiler on that function and ship the impurity. Reserve `"use no memo"` for genuinely exceptional cases: a hot path you've hand-optimized in a way the compiler can't match, or a temporary unblock while you fix the real cause. Every `"use no memo"` should carry a comment explaining why, same discipline as a manual `memo` at a boundary ([`memoization-and-the-compiler`](./memoization-and-the-compiler.md#reference)).
 
 ### File and directory exclusion (config)
 
@@ -221,7 +221,7 @@ For a cautious production rollout, the compiler supports **gating** — emitting
 
 **Incremental adoption (existing codebase).** Lint first — turn on the `react-hooks/` compiler rules and fix violations with the compiler still off, so you're fixing code, not chasing compile output. Then either switch to `annotation` mode and opt components in file by file, or go to `infer` with the worst legacy directories excluded, and shrink the exclude list over time. The two strategies converge; pick based on how much of the codebase you trust to be rule-clean.
 
-**Manual memo coexistence.** The compiler *preserves* correct manual memoization (`preserve-manual-memoization` guards this), so adopting it doesn't require ripping out every `useMemo` first. But most manual memo becomes redundant noise once the compiler is on — clean it up opportunistically, keeping only the commented boundary cases from [`memoization-and-the-compiler`](./memoization-and-the-compiler.md#manual-memo-estate-table).
+**Manual memo coexistence.** The compiler *preserves* correct manual memoization (`preserve-manual-memoization` guards this), so adopting it doesn't require ripping out every `useMemo` first. But most manual memo becomes redundant noise once the compiler is on — clean it up opportunistically, keeping only the commented boundary cases from [`memoization-and-the-compiler`](./memoization-and-the-compiler.md#reference).
 
 **Where the wins actually are.** The compiler's biggest gains are expensive children that re-render because a frequently-rendering parent re-renders — the exact shape the [`typing-lag-rerender-storm`](../recipes/performance/typing-lag-rerender-storm.md) recipe fixes, where the Compiler-verification rung catches a purity bug. Leaf components and already-hand-optimized code barely move. Don't expect the compiler to make the whole app faster; expect it to erase a specific, common class of wasted re-renders.
 

@@ -38,7 +38,7 @@ The unifying idea: a mutation has a **pending** phase, a **success** result, a *
 4. Publishes the submission state (`pending`, the `FormData`, method, action) into a **form-status context** that wraps the form's subtree.
 5. On success, **resets uncontrolled fields** (you can opt out with `requestFormReset` from `react-dom`, or by using controlled inputs whose value you own).
 
-Step 4 is the detail that explains `useFormStatus`'s odd placement rule, and step 3 is the through-line to everything else: it's the same async transition from [`concurrent-rendering`](./concurrent-rendering.md#async-transitions-forward-pointer), now triggered by a submit and handed a `FormData`.
+Step 4 is the detail that explains `useFormStatus`'s odd placement rule, and step 3 is the through-line to everything else: it's the same async transition from [`concurrent-rendering`](./concurrent-rendering.md#real-world-patterns), now triggered by a submit and handed a `FormData`.
 
 ### `useActionState` — the reducer, productized
 
@@ -153,7 +153,7 @@ We'll build a comment form that validates, posts, shows an instant optimistic co
 
 ### Stage 1 — the reducer-shaped action with validation as state
 
-Validation errors are *expected* outcomes, so they're **returned as state**, not thrown — the errors-as-state side of [`error-boundaries`](../rendering/error-boundaries.md#errors-as-state-vs-errors-as-thrown)'s taxonomy. Only genuinely exceptional failures throw to the boundary.
+Validation errors are *expected* outcomes, so they're **returned as state**, not thrown — the errors-as-state side of [`error-boundaries`](../rendering/error-boundaries.md#the-trycatch-redirect-paid)'s taxonomy. Only genuinely exceptional failures throw to the boundary.
 
 ```tsx
 import { useActionState } from "react";

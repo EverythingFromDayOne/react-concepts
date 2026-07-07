@@ -40,11 +40,11 @@ JSX diverges from its usual camelCase for accessibility attributes, and the exce
 
 ### `useId`, and why not a counter
 
-Associations need matching IDs on both nodes (`htmlFor`/`id`, `aria-describedby`/`id`). Hardcoding an ID breaks when a component renders twice; a module-level `nextId++` counter or `Math.random()` breaks under SSR, because the server and client must emit *identical* IDs for hydration to match — a mismatch either throws a hydration warning or silently unlinks the label ([the ssr-and-hydration article](../server/ssr-and-hydration.md#hydration-mismatch) owns why). `useId` generates IDs that are stable across renders and identical across the server/client boundary, and it's portal-safe. It is the only correct way to mint an ID for an ARIA association.
+Associations need matching IDs on both nodes (`htmlFor`/`id`, `aria-describedby`/`id`). Hardcoding an ID breaks when a component renders twice; a module-level `nextId++` counter or `Math.random()` breaks under SSR, because the server and client must emit *identical* IDs for hydration to match — a mismatch either throws a hydration warning or silently unlinks the label ([the ssr-and-hydration article](../server/ssr-and-hydration.md#the-agreement-contract-and-why-mismatches-are-expensive) owns why). `useId` generates IDs that are stable across renders and identical across the server/client boundary, and it's portal-safe. It is the only correct way to mint an ID for an ARIA association.
 
 ### `inert`: the focus-trap primitive
 
-React 19 supports **`inert` as a boolean prop** (pre-19 needed a string-attribute workaround). `inert` removes an entire subtree from focus, clicks, tabbing, *and* the accessibility tree in one attribute — strictly more than `aria-hidden`, which hides from AT but leaves the subtree clickable and tabbable. When a modal opens, marking the rest of the page `inert` is the whole focus trap: focus physically cannot leave the dialog because everything else is gone from the tab order. Refs remain the escape hatch for the imperative `.focus()` call itself ([owned by the useref article](../effects/useref-and-the-dom.md#the-containment-embassy)).
+React 19 supports **`inert` as a boolean prop** (pre-19 needed a string-attribute workaround). `inert` removes an entire subtree from focus, clicks, tabbing, *and* the accessibility tree in one attribute — strictly more than `aria-hidden`, which hides from AT but leaves the subtree clickable and tabbable. When a modal opens, marking the rest of the page `inert` is the whole focus trap: focus physically cannot leave the dialog because everything else is gone from the tab order. Refs remain the escape hatch for the imperative `.focus()` call itself ([owned by the useref article](../effects/useref-and-the-dom.md#real-world-patterns)).
 
 ## Basic usage
 
@@ -166,7 +166,7 @@ export function ConfirmDialog({ open, onClose, onConfirm }: ConfirmDialogProps) 
 
 ### Step 3 — The custom portal version (when you need control)
 
-When you need a dialog the native element can't express — bespoke animation, nested layering, a design-system API — render through a [portal](../rendering/portals-and-the-event-system.md#portals) and reproduce the four behaviors by hand:
+When you need a dialog the native element can't express — bespoke animation, nested layering, a design-system API — render through a [portal](../rendering/portals-and-the-event-system.md) and reproduce the four behaviors by hand:
 
 ```tsx
 // Modal.tsx
@@ -243,7 +243,7 @@ That's `role="dialog"` + `aria-modal` + a name (`aria-labelledby`), focus moved 
 
 ### Step 4 — Accessible errors for the form inside
 
-A form in the dialog needs its errors *announced* and *associated*, not just colored red. Wire `aria-invalid`, point `aria-describedby` at the error's id, and give the error `role="alert"` so it's read the moment it appears (the [forms-at-scale](../forms/forms-at-scale.md#field-errors) and [forms-controlled](../forms/forms-controlled-and-uncontrolled.md) articles own the validation flow; here we make its output accessible):
+A form in the dialog needs its errors *announced* and *associated*, not just colored red. Wire `aria-invalid`, point `aria-describedby` at the error's id, and give the error `role="alert"` so it's read the moment it appears (the [forms-at-scale](../forms/forms-at-scale.md#step-2--the-form-register-field-array-per-field-errors) and [forms-controlled](../forms/forms-controlled-and-uncontrolled.md) articles own the validation flow; here we make its output accessible):
 
 ```tsx
 import { useId } from "react";
@@ -290,9 +290,9 @@ Even done correctly, the modal has edge cases that will bite: iOS VoiceOver's ro
 
 **Live regions, precisely.** `role="status"` / `aria-live="polite"` waits for a pause (use for toasts, saved-confirmations, result counts); `role="alert"` / `aria-live="assertive"` interrupts (use sparingly, for errors). Two gotchas: the region must exist in the DOM *before* it's populated (insert empty, then set text), and `aria-atomic="true"` makes AT re-read the whole region rather than just the diff. Pair a polite region with [Suspense](../concurrent/suspense.md) fallbacks and action pending states to narrate async UI.
 
-**Semantics are orthogonal to styling.** A Tailwind-styled `<div>` that *looks* like a button is not a button — `className` never touches the accessibility tree ([the styling article](../ecosystem/styling-approaches.md#semantics) owns this boundary). Style the real element: `<button className="…">`. This is why "use a component library's Button" is good a11y advice and "copy the button's CSS onto a div" is a trap.
+**Semantics are orthogonal to styling.** A Tailwind-styled `<div>` that *looks* like a button is not a button — `className` never touches the accessibility tree ([the styling article](../ecosystem/styling-approaches.md#real-world-patterns) owns this boundary). Style the real element: `<button className="…">`. This is why "use a component library's Button" is good a11y advice and "copy the button's CSS onto a div" is a trap.
 
-**Tests are an accessibility check.** Querying by role in RTL isn't just a testing style — `getByRole("button", { name: /save/i })` *fails* if your control has no accessible role or name, so a passing role-based test is a passing a11y smoke test ([the testing article](../ecosystem/testing.md#the-query-priority-ladder) established the query ladder; here's the payoff). Add `jest-axe` for a structural audit:
+**Tests are an accessibility check.** Querying by role in RTL isn't just a testing style — `getByRole("button", { name: /save/i })` *fails* if your control has no accessible role or name, so a passing role-based test is a passing a11y smoke test ([the testing article](../ecosystem/testing.md#how-it-works-under-the-hood) established the query ladder; here's the payoff). Add `jest-axe` for a structural audit:
 
 ```tsx
 import { axe } from "jest-axe";
@@ -349,7 +349,7 @@ test("dialog has no a11y violations", async () => {
 
 ## How this evolved
 
-Early React inherited HTML's accessibility model but the ecosystem drifted into `<div>`-soup with click handlers, because JSX made a styled div as easy to ship as a semantic element. Focus management was awkward in the class era and stayed clumsy through the `forwardRef` years, since moving focus into a child component meant threading refs by hand. React 18's `useId` fixed SSR-safe associations — the single most common a11y wiring, finally correct across hydration. React 19 removed more friction: [ref-as-prop](../effects/useref-and-the-dom.md#ref-as-a-prop) dropped the `forwardRef` ceremony around focusable components, and first-class `inert` turned focus-trapping from a MutationObserver hack into one declarative prop. In parallel the platform matured — `:focus-visible`, `inert`, `prefers-reduced-motion`, and a robust native `<dialog>` all landed and React just passes them through — and headless libraries (React Aria, Radix) emerged as the production answer to "don't author ARIA widgets by hand." The arc: from bolting ARIA onto divs, to leaning on native semantics and platform primitives while React stays out of the way.
+Early React inherited HTML's accessibility model but the ecosystem drifted into `<div>`-soup with click handlers, because JSX made a styled div as easy to ship as a semantic element. Focus management was awkward in the class era and stayed clumsy through the `forwardRef` years, since moving focus into a child component meant threading refs by hand. React 18's `useId` fixed SSR-safe associations — the single most common a11y wiring, finally correct across hydration. React 19 removed more friction: [ref-as-prop](../effects/useref-and-the-dom.md#ref-is-a-prop-now) dropped the `forwardRef` ceremony around focusable components, and first-class `inert` turned focus-trapping from a MutationObserver hack into one declarative prop. In parallel the platform matured — `:focus-visible`, `inert`, `prefers-reduced-motion`, and a robust native `<dialog>` all landed and React just passes them through — and headless libraries (React Aria, Radix) emerged as the production answer to "don't author ARIA widgets by hand." The arc: from bolting ARIA onto divs, to leaning on native semantics and platform primitives while React stays out of the way.
 
 ## Exercises
 
@@ -365,11 +365,11 @@ React renders the DOM you write, accessible or not, so accessibility is a discip
 
 ## See also
 
-- [useref and the DOM](../effects/useref-and-the-dom.md#the-containment-embassy) — the ref mechanics behind focus management.
-- [Portals and the event system](../rendering/portals-and-the-event-system.md#portals) — where the custom modal renders.
-- [Testing](../ecosystem/testing.md#the-query-priority-ladder) — role queries and `jest-axe` as the a11y regression gate.
-- [Forms at scale](../forms/forms-at-scale.md#field-errors) / [controlled forms](../forms/forms-controlled-and-uncontrolled.md) — the validation flow whose output this wires for AT.
-- [Styling approaches](../ecosystem/styling-approaches.md#semantics) — why `className` never touches the accessibility tree.
+- [useref and the DOM](../effects/useref-and-the-dom.md#real-world-patterns) — the ref mechanics behind focus management.
+- [Portals and the event system](../rendering/portals-and-the-event-system.md) — where the custom modal renders.
+- [Testing](../ecosystem/testing.md#how-it-works-under-the-hood) — role queries and `jest-axe` as the a11y regression gate.
+- [Forms at scale](../forms/forms-at-scale.md#step-2--the-form-register-field-array-per-field-errors) / [controlled forms](../forms/forms-controlled-and-uncontrolled.md) — the validation flow whose output this wires for AT.
+- [Styling approaches](../ecosystem/styling-approaches.md#real-world-patterns) — why `className` never touches the accessibility tree.
 - [Routing (React Router)](../ecosystem/routing-react-router.md) — route-change focus management.
 
 ## References

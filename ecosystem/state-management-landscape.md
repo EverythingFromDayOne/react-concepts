@@ -18,6 +18,8 @@ status:
 
 ## What it is
 
+### The placement funnel
+
 State management is a **categorization** problem wearing a library problem's clothes. Before you compare tools, run the placement funnel — four questions, in order, that drain most "global state" away:
 
 1. **Is it server data** (fetched, owned by a backend, can change without you)? → a query cache: [`TanStack Query`](./data-fetching-tanstack-query.md) (or RTK Query in a Redux shop). Never a client store. This one question removes 60–80% of what teams reach for Redux to hold.
@@ -31,7 +33,7 @@ Only if the answer to all four is *no* do you actually have a store question. Wh
 
 The libraries differ on *lots* of surface API, but there's exactly **one mechanical axis** that matters, and it's the reason they exist instead of context: **subscription granularity** — how narrowly a component can subscribe so it re-renders only when *its* slice changes.
 
-[`context`](../state/context.md) has none. A Provider value change marks *every* consumer dirty and re-renders all of them, piercing the bailout check that would otherwise stop propagation (traced in [`how-react-renders`](../rendering/how-react-renders.md#bailout)). Value identity is the whole ballgame; split-context is the manual escape, and it doesn't scale past a few axes. That limit — one value, all-or-nothing — is exactly what the [`context-rerenders-the-whole-tree` recipe](../recipes/state-management/context-rerenders-the-whole-tree.md) diagnoses.
+[`context`](../state/context.md) has none. A Provider value change marks *every* consumer dirty and re-renders all of them, piercing the bailout check that would otherwise stop propagation (traced in [`how-react-renders`](../rendering/how-react-renders.md#bailouts-the-fast-paths)). Value identity is the whole ballgame; split-context is the manual escape, and it doesn't scale past a few axes. That limit — one value, all-or-nothing — is exactly what the [`context-rerenders-the-whole-tree` recipe](../recipes/state-management/context-rerenders-the-whole-tree.md) diagnoses.
 
 The stores solve it by living **outside React** and exposing a selector:
 
@@ -39,7 +41,7 @@ The stores solve it by living **outside React** and exposing a selector:
 - **Jotai** inverts it: state is split into **atoms**, and a component subscribes to specific atoms. Updating one atom notifies only that atom's dependents. Granularity is per-atom, bottom-up — "increment this counter, only this counter re-renders," no selector needed because the atom *is* the subscription unit.
 - **Redux Toolkit** is one store read through `useSelector`, memoized selectors doing the slice-scoping, with the Flux discipline (actions describe what happened, reducers compute the next state) layered on top for traceability.
 
-All three sit on `useSyncExternalStore`, which is also *why* they don't tear under concurrent rendering — the tearing problem and that hook's invariants are [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore)'s territory. Context, being in-tree, never had a tearing problem to solve; the stores had to, and did.
+All three sit on `useSyncExternalStore`, which is also *why* they don't tear under concurrent rendering — the tearing problem and that hook's invariants are [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore--subscribing-to-external-state-safely)'s territory. Context, being in-tree, never had a tearing problem to solve; the stores had to, and did.
 
 That's the whole mechanical story. Everything else — middleware, devtools, persistence — is convenience on top of "subscribe to a slice of an external store."
 
@@ -237,7 +239,7 @@ The caveat is SSR/hydration: the server renders with the default state (it has n
 7. **Global-everything.** Putting an input's local value in a global store because the store is right there throws away colocation and turns every keystroke into a store update. Local state stays local; the store is for the residue.
 8. **Selecting the whole store.** `useStore((s) => s)` (or an unselected `useSelector((s) => s)`) subscribes to *everything* and re-renders on every change — you've turned your selector store back into a megacontext. Select the narrowest slice you use.
 9. **Jotai atoms created in render.** An `atom(...)` created inside a component body has a new identity each render; without `useMemo`/`useRef` it causes an infinite loop with `useAtom`. Define atoms at module scope (or memoize dynamic ones).
-10. **Mirroring server/props into a store, synced by an effect.** `useEffect(() => store.setState(query.data))` re-creates the staleness and duplication the placement rule exists to prevent. Read from the cache directly; derive, don't mirror — the same rule from [`usereducer-and-state-structure`](../state/usereducer-and-state-structure.md#derive-vs-mirror), at store scale.
+10. **Mirroring server/props into a store, synced by an effect.** `useEffect(() => store.setState(query.data))` re-creates the staleness and duplication the placement rule exists to prevent. Read from the cache directly; derive, don't mirror — the same rule from [`usereducer-and-state-structure`](../state/usereducer-and-state-structure.md#derive-vs-mirror--the-deep-dive), at store scale.
 
 ## How this evolved
 

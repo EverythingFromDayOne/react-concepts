@@ -22,7 +22,7 @@ status:
 
 The roadmap's stance is that RSC ships to production through Next.js, and this article is where we cash that in. The App Router is Next.js's RSC-native router: server components render on the server, `"use client"` marks the islands that ship JS to the browser, and the build produces two artifacts per route — static HTML for the first paint and a serialized RSC payload for client navigations.
 
-What the framework adds on top of the raw model is four things you would otherwise hand-build: a **file-system router** with layouts and streaming; a **build that prerenders a static shell** and streams the dynamic remainder (Partial Prerendering); an **explicit caching layer** (`use cache`, `cacheLife`, `cacheTag`) with tag-based invalidation; and **Server Actions** — server functions you call straight from a form to mutate data and revalidate the cache in one round trip. It also owns the toolchain: the React Compiler is built in (you do *not* wire it yourself the way the [Vite SPA does](../rendering/react-compiler-deep-dive.md#vite-wiring)), and Turbopack is the default bundler.
+What the framework adds on top of the raw model is four things you would otherwise hand-build: a **file-system router** with layouts and streaming; a **build that prerenders a static shell** and streams the dynamic remainder (Partial Prerendering); an **explicit caching layer** (`use cache`, `cacheLife`, `cacheTag`) with tag-based invalidation; and **Server Actions** — server functions you call straight from a form to mutate data and revalidate the cache in one round trip. It also owns the toolchain: the React Compiler is built in (you do *not* wire it yourself the way the [Vite SPA does](../rendering/react-compiler-deep-dive.md#the-vite-8-wiring-and-the-gotcha)), and Turbopack is the default bundler.
 
 Baseline for this article: **Next.js 16** (which requires **React 19.2+**), with **Cache Components** enabled. Every API here is the stable, non-`unstable_` form.
 
@@ -45,7 +45,7 @@ This is **Partial Prerendering (PPR)**: one page, static shell served instantly 
 
 ### The RSC payload and the toolchain
 
-The serialized output the server streams is the RSC payload — the same format [the RSC article](../server/server-components.md#the-payload) traces; here it's just the thing the App Router build emits and the client uses to reconcile on navigation. Two toolchain facts follow from the framework owning the build. First, the **React Compiler is built in** — enable `reactCompiler: true` and Next.js runs it as part of its own pipeline (historically a Babel transform, now with a native Rust port in Turbopack). You never touch `@rolldown/plugin-babel` here; that wiring is a Vite-SPA concern the [compiler deep dive](../rendering/react-compiler-deep-dive.md#vite-wiring) owns, and the "double compile" it warns about is exactly this — the framework compiles for you, so adding your own Babel pass would run the compiler twice. Second, `params`, `searchParams`, `cookies()`, and `headers()` are **async** in 16 (synchronous access was fully removed) — you `await params`, always.
+The serialized output the server streams is the RSC payload — the same format [the RSC article](../server/server-components.md#the-rsc-payload-and-serialization) traces; here it's just the thing the App Router build emits and the client uses to reconcile on navigation. Two toolchain facts follow from the framework owning the build. First, the **React Compiler is built in** — enable `reactCompiler: true` and Next.js runs it as part of its own pipeline (historically a Babel transform, now with a native Rust port in Turbopack). You never touch `@rolldown/plugin-babel` here; that wiring is a Vite-SPA concern the [compiler deep dive](../rendering/react-compiler-deep-dive.md#the-vite-8-wiring-and-the-gotcha) owns, and the "double compile" it warns about is exactly this — the framework compiles for you, so adding your own Babel pass would run the compiler twice. Second, `params`, `searchParams`, `cookies()`, and `headers()` are **async** in 16 (synchronous access was fully removed) — you `await params`, always.
 
 ## Basic usage
 
@@ -237,7 +237,7 @@ export async function submitReview(
 }
 ```
 
-The form is a client island so it can show pending and error state, wiring the action through React 19's `useActionState` (the mutation-state mechanism is owned by [the Actions article](../concurrent/actions.md#useactionstate) — here we only connect it to a *server* action):
+The form is a client island so it can show pending and error state, wiring the action through React 19's `useActionState` (the mutation-state mechanism is owned by [the Actions article](../concurrent/actions.md#useactionstate--the-reducer-productized) — here we only connect it to a *server* action):
 
 ```tsx
 // app/products/[id]/ReviewForm.tsx
@@ -348,7 +348,7 @@ Server state is fetched on the server and lives in the Query cache on the client
 - `revalidateTag(tag, "max")` — Server Actions *or* Route Handlers (the `app/**/route.ts` endpoint files). Stale-while-revalidate: serves stale, refreshes in the background, and only on next visit. Use it when a slight delay is fine (a CMS publish, a catalog refresh). Note the single-argument `revalidateTag(tag)` is **deprecated** — always pass the profile.
 - `revalidatePath("/products")` — path-based and blunt; flushes everything under a path. Prefer tags; reach for this only when you truly want a whole segment gone.
 
-**Server Actions are the mutation half of React 19 Actions.** The client `<form action>` / `useActionState` / `useOptimistic` machinery is [owned by the Actions article](../concurrent/actions.md); Next.js supplies the *server* function it calls and the revalidation that follows. The clean division: validate + mutate + `updateTag` on the server; pending + error + optimistic UI on the client. Reuse the same Zod schema on both sides exactly as [forms-at-scale](../forms/forms-at-scale.md#shared-schema) prescribes.
+**Server Actions are the mutation half of React 19 Actions.** The client `<form action>` / `useActionState` / `useOptimistic` machinery is [owned by the Actions article](../concurrent/actions.md); Next.js supplies the *server* function it calls and the revalidation that follows. The clean division: validate + mutate + `updateTag` on the server; pending + error + optimistic UI on the client. Reuse the same Zod schema on both sides exactly as [forms-at-scale](../forms/forms-at-scale.md#step-1--one-schema-both-sides) prescribes.
 
 **Framework-mode routing lands here.** The [React Router article](../ecosystem/routing-react-router.md) deliberately covered *data mode* and fenced framework mode out of Phase 1; the App Router is that framework-mode router, RSC-native. If you're choosing between them: React Router (data mode) for a Vite SPA where you own the server story; Next.js App Router when you want RSC, streaming, and caching as framework primitives rather than things you assemble.
 
@@ -421,9 +421,9 @@ Next.js is where the RSC model becomes a production app. In Next.js 16 the defin
 ## See also
 
 - [Server Components](../server/server-components.md) — the RSC model this article puts into production (boundary, serialization, payload).
-- [SSR and hydration](../server/ssr-and-hydration.md#streaming) — the streaming fundamentals PPR builds on.
-- [Actions](../concurrent/actions.md#useactionstate) — the client mutation machinery Server Actions plug into.
-- [Data fetching with TanStack Query](../ecosystem/data-fetching-tanstack-query.md#hydration) — the client cache the RSC→Query bridge hydrates.
+- [SSR and hydration](../server/ssr-and-hydration.md#streaming-and-selective-hydration) — the streaming fundamentals PPR builds on.
+- [Actions](../concurrent/actions.md#useactionstate--the-reducer-productized) — the client mutation machinery Server Actions plug into.
+- [Data fetching with TanStack Query](../ecosystem/data-fetching-tanstack-query.md#real-world-patterns) — the client cache the RSC→Query bridge hydrates.
 - [Suspense](../concurrent/suspense.md) — the boundary that turns a dynamic subtree into a streamed one.
 - [Recipe: hydration mismatch on dates/random values](../recipes/ssr-and-rsc/hydration-mismatch.md) *(planned)* — opens the ssr-and-rsc recipe track this article gates.
 - [Recipe: `"use client"` sprawl](../recipes/ssr-and-rsc/use-client-sprawl.md) *(planned)* — keeping the client bundle small.

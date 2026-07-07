@@ -9,7 +9,7 @@ related:
   - concurrent/suspense
   - ecosystem/routing-react-router
   - concurrent/use-and-promises
-  - data-fetching/search-race-condition
+  - recipes/data-fetching/search-race-condition
 status:
   drafted: true
   reviewed: false

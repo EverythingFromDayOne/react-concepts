@@ -8,6 +8,8 @@ related:
   - ecosystem/data-fetching-tanstack-query
   - ecosystem/routing-react-router
   - effects/effects-and-synchronization
+  - recipes/data-fetching/search-race-condition
+  - recipes/data-fetching/strictmode-double-mount
 status:
   drafted: true
   reviewed: false
@@ -151,7 +153,7 @@ Clearing the cache on logout is its own recurring bug — the sibling [logout-le
 - **Access token in a header instead of a cookie.** If you carry the access token in an `Authorization` header (in memory — never localStorage), `refreshToken` updates the in-memory token and the retry re-reads it. The single-flight structure is identical; only the token plumbing changes.
 - **Axios interceptors.** The same pattern as a response interceptor: on 401, await the shared `refreshPromise`, then replay the original `config`. Axios makes the "queue and replay" explicit, but it's the same single-flight promise.
 - **Proactive refresh.** Refresh *before* expiry — a timer set to fire a minute before the token dies, or a refresh on window-focus — so the 401 dance rarely runs at all. You still need single-flight, because a focus event and an in-flight request can collide.
-- **Mutations mid-refresh.** A `POST` that 401s should also queue behind the refresh and retry — but retrying a non-idempotent write needs the same care as [the double-mount recipe's write classification](../data-fetching/strictmode-double-mount.md#read-vs-write): only auto-retry writes that are safe to repeat, or gate them with an idempotency key.
+- **Mutations mid-refresh.** A `POST` that 401s should also queue behind the refresh and retry — but retrying a non-idempotent write needs the same care as [the double-mount recipe's write classification](../data-fetching/strictmode-double-mount.md#stage-3--the-write-path-is-a-different-bug): only auto-retry writes that are safe to repeat, or gate them with an idempotency key.
 
 ## Trade-offs and common pitfalls
 

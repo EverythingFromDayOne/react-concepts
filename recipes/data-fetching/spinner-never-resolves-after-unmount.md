@@ -8,6 +8,7 @@ related:
   - effects/effects-and-synchronization
   - ecosystem/data-fetching-tanstack-query
   - concurrent/suspense
+  - recipes/state-management/zustand-goes-stale
 status:
   drafted: true
   reviewed: false
@@ -73,7 +74,7 @@ export function RevenueTab() {
 }
 ```
 
-On a fast connection it's flawless. On a throttled phone: a user taps **Revenue** (fires a 1.4s fetch, sets `revenue.loading = true`), then taps back to **Overview** before it resolves. `RevenueTab` unmounts; the cleanup aborts the fetch — correct, per [effects-and-synchronization](../../effects/effects-and-synchronization.md#the-abortcontroller-pattern). The abort rejects the promise, the `ignore` guard (correctly) suppresses the stale write — so `setRevenue({ loading: false })` **never runs**. `revenue.loading` is now stuck `true` in the store. Tap **Revenue** again: the tab remounts, the effect's `if (loading || data) return` sees `loading: true`, skips the fetch, and renders `<Spinner />` — forever. Only a full reload clears it. Support tickets: *"Revenue just spins, I have to refresh."* Repros about 1 in 20 mobile sessions.
+On a fast connection it's flawless. On a throttled phone: a user taps **Revenue** (fires a 1.4s fetch, sets `revenue.loading = true`), then taps back to **Overview** before it resolves. `RevenueTab` unmounts; the cleanup aborts the fetch — correct, per [effects-and-synchronization](../../effects/effects-and-synchronization.md#fetching-in-an-effect-the-full-bill-and-the-locked-pattern). The abort rejects the promise, the `ignore` guard (correctly) suppresses the stale write — so `setRevenue({ loading: false })` **never runs**. `revenue.loading` is now stuck `true` in the store. Tap **Revenue** again: the tab remounts, the effect's `if (loading || data) return` sees `loading: true`, skips the fetch, and renders `<Spinner />` — forever. Only a full reload clears it. Support tickets: *"Revenue just spins, I have to refresh."* Repros about 1 in 20 mobile sessions.
 
 **Why it escaped QA:** on localhost the fetch resolves in ~4ms — faster than anyone can tap away — so the abort branch never runs in testing. The bug needs a slow request *and* a fast navigation, which only happens on real networks. StrictMode's dev double-mount exercises mount→unmount→mount, but the instant localhost resolve lands the data before the guard can matter.
 
@@ -212,7 +213,7 @@ If the request is genuinely **fire-and-forget** — an analytics beacon, a best-
 
 ## See also
 
-- [Effects and synchronization](../../effects/effects-and-synchronization.md#the-abortcontroller-pattern) — the cleanup/abort contract this recipe builds on.
+- [Effects and synchronization](../../effects/effects-and-synchronization.md#fetching-in-an-effect-the-full-bill-and-the-locked-pattern) — the cleanup/abort contract this recipe builds on.
 - [Data fetching with TanStack Query](../../ecosystem/data-fetching-tanstack-query.md) — derives status from the request, so it can't strand a spinner.
 - [Recipe: search race condition](./search-race-condition.md) — the *ordering* half of the trio; the race the naive guard-removal reintroduces.
 - [Recipe: StrictMode double-mount](./strictmode-double-mount.md) — the *dedup* half; the resolve-after-unmount sibling bug.

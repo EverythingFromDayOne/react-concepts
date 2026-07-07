@@ -15,7 +15,7 @@ status:
 
 # URL params drift out of sync with component state
 
-> **What you'll build:** you'll take a product listing whose filters vanish when the user hits Back, trace it to a `useState` mirror of the URL that never re-syncs, and fix it by making the URL the single source of truth — derived during render, not copied into state. This is [derive-don't-mirror](../../state/usereducer-and-state-structure.md#derive-vs-mirror) applied to the address bar, and it's the routing-track opener.
+> **What you'll build:** you'll take a product listing whose filters vanish when the user hits Back, trace it to a `useState` mirror of the URL that never re-syncs, and fix it by making the URL the single source of truth — derived during render, not copied into state. This is [derive-don't-mirror](../../state/usereducer-and-state-structure.md#derive-vs-mirror--the-deep-dive) applied to the address bar, and it's the routing-track opener.
 
 ## The scenario
 
@@ -70,7 +70,7 @@ useEffect(() => {
 }, [params]);
 ```
 
-This is the textbook [derive-don't-mirror](../../state/usereducer-and-state-structure.md#derive-vs-mirror) anti-pattern, and [you might not need an effect](https://react.dev/learn/you-might-not-need-an-effect) names it directly. It adds a render (URL changes → commit → effect → setState → second commit), it lags for one frame, and if you also sync state→URL you get a loop. You're spending an effect to recompute a value you could just read.
+This is the textbook [derive-don't-mirror](../../state/usereducer-and-state-structure.md#derive-vs-mirror--the-deep-dive) anti-pattern, and [you might not need an effect](https://react.dev/learn/you-might-not-need-an-effect) names it directly. It adds a render (URL changes → commit → effect → setState → second commit), it lags for one frame, and if you also sync state→URL you get a loop. You're spending an effect to recompute a value you could just read.
 
 ### Stage 3 — Read the URL; don't store it
 
@@ -102,7 +102,7 @@ export function ProductList() {
 }
 ```
 
-Now Back, Forward, a pasted link, and "Clear filters" all Just Work, because there's nothing to keep in sync — the render reads whatever the URL currently says. The functional `setSearchParams(prev => …)` preserves the params you're not touching, and `{ replace: true }` keeps each filter keystroke out of the history stack. This is the whole fix: the mirror is gone. ([React Router's](../../ecosystem/routing-react-router.md#usesearchparams) `useSearchParams` owns this API.)
+Now Back, Forward, a pasted link, and "Clear filters" all Just Work, because there's nothing to keep in sync — the render reads whatever the URL currently says. The functional `setSearchParams(prev => …)` preserves the params you're not touching, and `{ replace: true }` keeps each filter keystroke out of the history stack. This is the whole fix: the mirror is gone. ([React Router's](../../ecosystem/routing-react-router.md#real-world-patterns) `useSearchParams` owns this API.)
 
 ### Stage 4 — Parse and validate the params
 
@@ -143,8 +143,8 @@ State belongs in the URL when it should **survive a refresh**, be **shareable**,
 
 ## See also
 
-- [Routing with React Router](../../ecosystem/routing-react-router.md#usesearchparams) — the `useSearchParams` read/write model this recipe leans on.
-- [useReducer and state structure](../../state/usereducer-and-state-structure.md#derive-vs-mirror) — the derive-don't-mirror rule, here applied to the URL.
+- [Routing with React Router](../../ecosystem/routing-react-router.md#real-world-patterns) — the `useSearchParams` read/write model this recipe leans on.
+- [useReducer and state structure](../../state/usereducer-and-state-structure.md#derive-vs-mirror--the-deep-dive) — the derive-don't-mirror rule, here applied to the URL.
 - [TanStack Router](../../ecosystem/tanstack-router.md#search-param-validation) — typed search params that design this failure out.
 - [Recipe: back button loses scroll position](./back-button-scroll.md) *(planned)* — the sibling routing recipe; scroll restoration when the URL is the source of truth.
 - [Recipe: lazy route flashes blank](./lazy-route-flashes-blank.md) *(planned)* — the route-code-splitting routing recipe.

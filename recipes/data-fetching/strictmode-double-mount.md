@@ -6,10 +6,10 @@ difficulty: intermediate
 react_baseline: "19.2"
 related:
   - effects/effects-and-synchronization
-  - data-fetching/search-race-condition
+  - recipes/data-fetching/search-race-condition
   - ecosystem/data-fetching-tanstack-query
   - rendering/how-react-renders
-  - forms-and-ux/double-submit-and-optimistic-like
+  - recipes/forms-and-ux/double-submit-and-optimistic-like
 status:
   drafted: true
   reviewed: false
@@ -53,7 +53,7 @@ This recipe is the *dedup* half of the data-fetching story. Its sibling, [`searc
 
 ### Stage 0 — Read the symptom correctly
 
-Before touching anything, name what StrictMode is doing. On mount in development it runs each component **mount → unmount → remount** — setup, cleanup, setup — deliberately, to surface effects that forgot to clean up. The mechanics live in [`how-react-renders`](../../rendering/how-react-renders.md#strictmode) and the audit checklist lives in [`effects-and-synchronization`](../../effects/effects-and-synchronization.md#strictmode); don't re-derive them here. The one thing to internalize:
+Before touching anything, name what StrictMode is doing. On mount in development it runs each component **mount → unmount → remount** — setup, cleanup, setup — deliberately, to surface effects that forgot to clean up. The mechanics live in [`how-react-renders`](../../rendering/how-react-renders.md#interruption-replay-and-why-strictmode-double-invokes) and the audit checklist lives in [`effects-and-synchronization`](../../effects/effects-and-synchronization.md#strictmode-the-symmetry-auditor); don't re-derive them here. The one thing to internalize:
 
 > The second request in dev is not the bug. It's StrictMode telling you the **first** effect had no cleanup — which is a bug that fires for real reasons in production.
 
@@ -72,7 +72,7 @@ This changes *nothing* about production behavior. The two effects still have no 
 
 ### Stage 2 — Fix the read path: abort + ignore
 
-The read (`GET`) is idempotent and safe to cancel, so it takes the locked pattern from [`effects-and-synchronization`](../../effects/effects-and-synchronization.md#the-abortcontroller-pattern) verbatim — an `AbortController` to cancel the in-flight fetch on cleanup, plus an ignore flag to guard the state write against a resolve-after-teardown race:
+The read (`GET`) is idempotent and safe to cancel, so it takes the locked pattern from [`effects-and-synchronization`](../../effects/effects-and-synchronization.md#fetching-in-an-effect-the-full-bill-and-the-locked-pattern) verbatim — an `AbortController` to cancel the in-flight fetch on cleanup, plus an ignore flag to guard the state write against a resolve-after-teardown race:
 
 ```tsx
 function ProductDetail({ id }: { id: string }) {
@@ -109,7 +109,7 @@ function ProductDetail({ id }: { id: string }) {
 }
 ```
 
-Now in dev: two requests still *start*, but StrictMode's cleanup aborts the first before it resolves — the Network tab shows one `(canceled)` and one real response, and `setStatus` runs exactly once. In production under a rapid remount, the same cleanup cancels the stale in-flight request instead of letting it land after teardown. The status union (from [`thinking-in-react`](../../foundations/thinking-in-react.md#status-unions)) means there's no `loading && !error && data` soup to get wrong while this races.
+Now in dev: two requests still *start*, but StrictMode's cleanup aborts the first before it resolves — the Network tab shows one `(canceled)` and one real response, and `setStatus` runs exactly once. In production under a rapid remount, the same cleanup cancels the stale in-flight request instead of letting it land after teardown. The status union (from [`thinking-in-react`](../../foundations/thinking-in-react.md#model-states-not-booleans)) means there's no `loading && !error && data` soup to get wrong while this races.
 
 Note what did **not** change: the double *starts* in dev. Abort makes the double *harmless*, not absent. Making it truly absent is Stage 4's job.
 
@@ -175,7 +175,7 @@ Two mounts of the same `queryKey` while a request is in flight **share the singl
 5. **Abort without the ignore flag.** Abort stops most in-flight work, but a request can resolve in the microtask window before cleanup runs; without the `ignore` guard you still write state into an unmounted tree. Ship both, always.
 6. **Forgetting to `return` the cleanup.** No returned function means no teardown means no protection — you've written the pattern and disabled it. The whole fix lives in the return.
 7. **Hand-rolling a module-scope in-flight `Map` to dedup.** This reinvents a query cache badly: it leaks across tests (no reset between renders), never expires, and has no invalidation. If you're building a dedup table, you want the library.
-8. **Keying the query without the variable.** `queryKey: ["product"]` (no `id`) dedupes across *different* products and serves whatever landed first. The key must contain everything the request depends on — same discipline as effect deps ("[deps are derived not chosen](../../rendering/memoization-and-the-compiler.md#deps-are-derived-not-chosen)").
+8. **Keying the query without the variable.** `queryKey: ["product"]` (no `id`) dedupes across *different* products and serves whatever landed first. The key must contain everything the request depends on — same discipline as effect deps ("[deps are derived not chosen](../../rendering/memoization-and-the-compiler.md#how-it-works-under-the-hood)").
 9. **Blaming StrictMode for every production double.** Once shipped, doubles come from remounts you caused — an unstable `key` recycling a subtree, a parent that unmounts on every render, deps that churn identity. Find the remount source; StrictMode is not in the building.
 10. **"It works in prod without cleanup, so I'll drop it."** True until the first route transition remounts the component mid-request, or `<Activity>` reveals a hidden tree. Cleanup is not optional insurance; it's the contract.
 11. **When NOT to reach for abort/dedup at all.** If the request is a genuine fire-and-forget side effect that must happen exactly once per user action — a purchase, a "record view" beacon, an audit log — do **not** contort a mount effect into behaving idempotently with abort gymnastics. The side effect is in the wrong home. Move it to a stable boundary (router loader/action, an event-fired mutation, `navigator.sendBeacon`, or the server). Mount effects are for *synchronizing with external systems*, not for *causing* one-time events; forcing the latter is how you got here.
@@ -187,7 +187,7 @@ Two mounts of the same `queryKey` while a request is in flight **share the singl
 - [`search-race-condition`](./search-race-condition.md) — the *ordering* sibling: stale responses overwriting fresh ones (this recipe is the *dedup* sibling)
 - [`data-fetching-tanstack-query`](../../ecosystem/data-fetching-tanstack-query.md) — *(planned)* the keyed-cache resolution; owns dedup, `staleTime`, invalidation, and `useSuspenseQuery`
 - [`double-submit-and-optimistic-like`](../forms-and-ux/double-submit-and-optimistic-like.md) — the write-idempotency half; a double-firing mount effect and a double-clicked button are the same bug
-- [`how-react-renders`](../../rendering/how-react-renders.md#strictmode) — why StrictMode double-invokes, mechanically
+- [`how-react-renders`](../../rendering/how-react-renders.md#interruption-replay-and-why-strictmode-double-invokes) — why StrictMode double-invokes, mechanically
 
 ## References
 

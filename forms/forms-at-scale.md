@@ -36,7 +36,7 @@ The axis is **submission complexity vs field complexity**. When the mutation is 
 
 Two mechanisms explain why RHF scales where controlled-everything doesn't.
 
-**Uncontrolled by default.** `register("email")` returns `{ name, ref, onChange, onBlur }` and spreads onto a native input. The value lives in the DOM, not in React state, so a keystroke doesn't call `setState` and doesn't re-render the form — the opposite of the controlled enforcement loop ([`forms-controlled-and-uncontrolled`](./forms-controlled-and-uncontrolled.md#the-enforcement-loop)) that re-renders on every character. For a 50-field form that's the difference between smooth and janky, and it's the same uncontrolled-via-refs insight, productized.
+**Uncontrolled by default.** `register("email")` returns `{ name, ref, onChange, onBlur }` and spreads onto a native input. The value lives in the DOM, not in React state, so a keystroke doesn't call `setState` and doesn't re-render the form — the opposite of the controlled enforcement loop ([`forms-controlled-and-uncontrolled`](./forms-controlled-and-uncontrolled.md#the-controlled-loop-traced)) that re-renders on every character. For a 50-field form that's the difference between smooth and janky, and it's the same uncontrolled-via-refs insight, productized.
 
 **Proxy-based `formState`.** `formState` is a proxy: you only *subscribe* to the pieces you read. Destructure `errors` and your component re-renders when errors change but not when `isDirty` flips; read `isSubmitting` and you track only that. Nothing re-renders on keystrokes unless a field you're displaying an error for changes validity. (One consequence, flagged in the RHF docs: the `useForm` return is being memoized, so putting the whole return object in a `useEffect` dependency array can cause loops — depend on specific fields.)
 
@@ -195,7 +195,7 @@ The `email-taken` error is something the client *cannot* know, so it comes back 
 
 **One schema, two validations.** The highest-leverage pattern in the walkthrough: `z.infer` gives the form's TypeScript type, `zodResolver` validates on the client, and the action calls `.safeParse` on the server. One source of truth for shape *and* rules; the client copy is a UX accelerator, never the authority.
 
-**Field arrays.** `useFieldArray({ control, name })` returns `{ fields, append, prepend, remove, swap, move, insert, update }`. Always key the rows with `field.id` (RHF generates it) — using the array index recycles state across reorders and removals, the exact corruption [`rendering-lists-and-keys`](../rendering/rendering-lists-and-keys.md#index-keys) warns about, now inside a form.
+**Field arrays.** `useFieldArray({ control, name })` returns `{ fields, append, prepend, remove, swap, move, insert, update }`. Always key the rows with `field.id` (RHF generates it) — using the array index recycles state across reorders and removals, the exact corruption [`rendering-lists-and-keys`](../rendering/rendering-lists-and-keys.md#the-corruption-traced) warns about, now inside a form.
 
 **Controlled UI-library inputs via `Controller`.** `register` works for native inputs; a custom `<Select>` or an MUI component that doesn't forward a ref needs `Controller` (or `useController`), which bridges RHF to a controlled component:
 

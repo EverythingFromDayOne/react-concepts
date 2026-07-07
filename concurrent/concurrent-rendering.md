@@ -49,7 +49,7 @@ So a "slow" concurrent render doesn't monopolize the main thread. A 120ms render
 
 ### Urgent vs transition lanes
 
-Every update is scheduled into a lane (see [`how-react-renders`](../rendering/how-react-renders.md#the-lane-model)). What Wave 2 didn't spell out is *which* lane, and that's the whole game here:
+Every update is scheduled into a lane (see [`how-react-renders`](../rendering/how-react-renders.md#lanes-how-react-decides-whats-urgent)). What Wave 2 didn't spell out is *which* lane, and that's the whole game here:
 
 - A default `setState` from an event handler (typing, clicking) lands in a **blocking** lane — high priority. React renders it as close to synchronously as it can; you want the character to appear the instant it's typed.
 - A `setState` wrapped in `startTransition` lands in a **transition** lane — low priority, drawn from a pool of ~16 transition lanes that React cycles through so distinct transitions don't clobber each other's identity.
@@ -66,7 +66,7 @@ Here's the sequence that makes concurrent rendering worth its complexity. You're
 2. Two slices in, keystroke "b" fires. `setQuery("...ab")` schedules a *new* blocking update. React marks the root as having work in a higher-priority lane than the one it's currently rendering.
 3. On the next `shouldYield()` boundary, React sees the higher lane. It calls `prepareFreshStack` — **throws away the half-built work-in-progress list tree** — commits the blocking input update ("b" appears), and restarts the transition render from scratch with the new query.
 
-Step 3 is safe for exactly one reason, and it's the reason double buffering exists ([`how-react-renders`](../rendering/how-react-renders.md#double-buffering)): the interrupted render was happening on the **work-in-progress tree**, a separate fiber tree from the **current** (committed, on-screen) tree. Abandoning it discards a scratch buffer. The screen was never showing a half-filtered list, because nothing committed. This is the deep payoff of the pointer-swap design: renders are provisional until commit, so throwing one away costs only the CPU already spent, never visual corruption.
+Step 3 is safe for exactly one reason, and it's the reason double buffering exists ([`how-react-renders`](../rendering/how-react-renders.md#two-trees-double-buffering)): the interrupted render was happening on the **work-in-progress tree**, a separate fiber tree from the **current** (committed, on-screen) tree. Abandoning it discards a scratch buffer. The screen was never showing a half-filtered list, because nothing committed. This is the deep payoff of the pointer-swap design: renders are provisional until commit, so throwing one away costs only the CPU already spent, never visual corruption.
 
 The intermediate renders that got abandoned never painted. If you type ten characters quickly, React may start ten list renders and commit only the last one. That's the mechanism behind "it feels instant even though the render is slow": the slow renders that would have janked you got cancelled before they reached the screen.
 
@@ -91,7 +91,7 @@ In a *synchronous* render these always agree — the whole tree renders in one u
 
 React's *own* state cannot tear. `useState`/`useReducer` values are read from the fiber, which is snapshotted for the duration of a render — every read within one render pass sees the same value, no matter how many tasks it spans (this is the snapshot discipline from [`state-and-usestate`](../state/state-and-usestate.md)). Tearing is strictly a hazard of reading a *mutable external source* directly in render.
 
-The fix is not this article's to own — [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore) owns `useSyncExternalStore`, which subscribes to an external store safely: React compares snapshots and, if it detects the store changed during a concurrent render, synchronously re-renders so it never *commits* a torn tree. What this article owns is *why the hazard exists at all* — interruptible rendering spanning tasks — so that when you reach for a store, you understand what `useSyncExternalStore` is defending against rather than treating it as a magic incantation.
+The fix is not this article's to own — [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore--subscribing-to-external-state-safely) owns `useSyncExternalStore`, which subscribes to an external store safely: React compares snapshots and, if it detects the store changed during a concurrent render, synchronously re-renders so it never *commits* a torn tree. What this article owns is *why the hazard exists at all* — interruptible rendering spanning tasks — so that when you reach for a store, you understand what `useSyncExternalStore` is defending against rather than treating it as a magic incantation.
 
 ### You can watch all of this now
 
@@ -262,7 +262,7 @@ export function SearchableList() {
 Two details carry the fix, and both depend on the Compiler:
 
 - **The input reads `query` (live), `ResultList` reads `deferredQuery` (lagging).** On each keystroke, React commits the input update at blocking priority immediately — caret stays at 60fps — then renders `ResultList` at transition priority. Type fast and the intermediate list renders get abandoned per the interruption trace above; only the last one paints.
-- **`ResultList` must actually skip re-rendering when `deferredQuery` is unchanged**, or the deferral is pointless. With React Compiler on (assumed for all app code), `ResultList` is auto-memoized, so a render where `deferredQuery` didn't change hits **bailout check 3** ([`how-react-renders`](../rendering/how-react-renders.md#the-three-bailout-checks)) and does no work. Confirm the ✨ badge is present on `ResultList` in DevTools — don't assume it; a purity violation can silently opt a component out of memoization ([`rules-of-react`](../foundations/rules-of-react.md)). This is the moment the Compiler-first stance and concurrent rendering interlock: the deferred boundary only saves work because the boundary is memoized.
+- **`ResultList` must actually skip re-rendering when `deferredQuery` is unchanged**, or the deferral is pointless. With React Compiler on (assumed for all app code), `ResultList` is auto-memoized, so a render where `deferredQuery` didn't change hits **bailout check 3** ([`how-react-renders`](../rendering/how-react-renders.md#bailouts-the-fast-paths)) and does no work. Confirm the ✨ badge is present on `ResultList` in DevTools — don't assume it; a purity violation can silently opt a component out of memoization ([`rules-of-react`](../foundations/rules-of-react.md)). This is the moment the Compiler-first stance and concurrent rendering interlock: the deferred boundary only saves work because the boundary is memoized.
 
 `isStale` is derived, not stored — `query !== deferredQuery` computed during render, per derive-don't-mirror ([`usereducer-and-state-structure`](../state/usereducer-and-state-structure.md)). It's `true` for the brief window where the visible list is a keystroke behind the input, which is exactly when you want the dim.
 
@@ -342,7 +342,7 @@ startTransition(() => setIsOpen(true));
 setIsOpen(true);
 ```
 
-**2. Using `useDeferredValue` to "debounce" network fetches.** This is the big one, and it's the scheduling-lag-vs-wall-clock-lag distinction promised back in [`usereducer-and-state-structure`](../state/usereducer-and-state-structure.md) and [`custom-hooks`](../effects/custom-hooks.md#explicit-deferral). A `useDebouncedValue(query, 300)` hook adds a **fixed wall-clock delay** and *skips intermediate values* — you fire one fetch after the user stops typing for 300ms, and the delay is 300ms whether the machine is a workstation or a phone. `useDeferredValue` adds **scheduling lag, not wall-clock lag**: it doesn't delay by a fixed amount and it doesn't skip values — every value eventually renders, just at low priority, interruptibly. On a fast machine the deferred render lands next frame; on a slow one it yields as needed. So:
+**2. Using `useDeferredValue` to "debounce" network fetches.** This is the big one, and it's the scheduling-lag-vs-wall-clock-lag distinction promised back in [`usereducer-and-state-structure`](../state/usereducer-and-state-structure.md) and [`custom-hooks`](../effects/custom-hooks.md#real-world-patterns). A `useDebouncedValue(query, 300)` hook adds a **fixed wall-clock delay** and *skips intermediate values* — you fire one fetch after the user stops typing for 300ms, and the delay is 300ms whether the machine is a workstation or a phone. `useDeferredValue` adds **scheduling lag, not wall-clock lag**: it doesn't delay by a fixed amount and it doesn't skip values — every value eventually renders, just at low priority, interruptibly. On a fast machine the deferred render lands next frame; on a slow one it yields as needed. So:
 
 - For an **expensive render** over a value: `useDeferredValue`. It keeps input responsive and abandons intermediate *renders* (which never paint), but it fires the same number of *computations* — it lowers priority, not count.
 - For an **expensive side effect** you want to fire *fewer* of (a network request, an analytics event): **debounce or throttle the effect itself**. `useDeferredValue` gives you no *controllable* reduction. A fetch effect keyed on `deferredQuery` fires once per *committed* deferred value — and how many values commit depends on the machine: on a fast machine nearly every keystroke's deferred render completes and commits (≈ one fetch per keystroke, same as `query`), while on a slow machine more deferred renders get abandoned before commit (fewer fetches). You've made your request count a nondeterministic function of CPU speed, which is precisely the wrong property for controlling network traffic. Debounce fires exactly one request per quiet period, deterministically, on every machine.
@@ -351,7 +351,7 @@ The one-line test: deferring changes *when and whether React re-renders*; deboun
 
 **3. Expecting concurrent features to make a slow render fast.** They don't reduce work; they reschedule it. A 120ms render is still 120ms of CPU — you've just stopped it from blocking input. If the render itself is the problem (dropped frames even without concurrent input contention, slow initial paint), fix the render: virtualize, split, do less. Concurrent features are a complement to the performance ladder, never a substitute for its lower rungs.
 
-**4. Reading mutable external state directly in render.** Covered under tearing above. A module-level mutable, a ref you mutate and read in render, a store read without a subscription — any of these can tear under interruption. Route external stores through `useSyncExternalStore` ([`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore)).
+**4. Reading mutable external state directly in render.** Covered under tearing above. A module-level mutable, a ref you mutate and read in render, a store read without a subscription — any of these can tear under interruption. Route external stores through `useSyncExternalStore` ([`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore--subscribing-to-external-state-safely)).
 
 **5. Deferring the wrong side.** Deferring the *input's own value* makes the input lag — the exact opposite of the goal. The input must always read the **live** value; defer the value the **expensive consumer** reads.
 
@@ -394,7 +394,7 @@ The shape of the arc: React spent five years turning rendering from an atomic bl
 *Hint:* `useTransition`, wrap `setActiveTab`. The button's active state is urgent (outside the transition); the panel render is the transition. Use `isPending` for the panel region only.
 
 **3. (Stretch) Reproduce tearing, then fix it.** Create a module-level mutable counter mutated on a fast interval, read it directly in render inside a deferred subtree, and force enough concurrent work to observe two components disagreeing. Then fix it and confirm the disagreement disappears.
-*Hint:* The fix is `useSyncExternalStore` — see [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore). Watch the Scheduler track to confirm the render is actually being sliced (tearing only shows when a render spans tasks).
+*Hint:* The fix is `useSyncExternalStore` — see [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore--subscribing-to-external-state-safely). Watch the Scheduler track to confirm the render is actually being sliced (tearing only shows when a render spans tasks).
 
 ## Summary
 
@@ -408,7 +408,7 @@ The shape of the arc: React spent five years turning rendering from an atomic bl
 ## See also
 
 - [`how-react-renders`](../rendering/how-react-renders.md) — the lane model, double buffering, and the three bailout checks this article extends.
-- [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore) — `useSyncExternalStore`, the fix for the tearing hazard traced here.
+- [`escape-hatches-audit`](../effects/escape-hatches-audit.md#usesyncexternalstore--subscribing-to-external-state-safely) — `useSyncExternalStore`, the fix for the tearing hazard traced here.
 - [`usereducer-and-state-structure`](../state/usereducer-and-state-structure.md) — transitions-in-one-place and the deliberate-lag exception the debounce contrast pays off.
 - [`custom-hooks`](../effects/custom-hooks.md) — the explicit-deferral discussion and why a `useDebouncedValue` hook is a different tool.
 - [`memoization-and-the-compiler`](../rendering/memoization-and-the-compiler.md) — the ✨ badge and why the deferred consumer must be memoized.

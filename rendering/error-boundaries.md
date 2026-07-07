@@ -31,13 +31,21 @@ The scoping rule is structural: a boundary protects its **children**, not itself
 
 ## How it works under the hood
 
-**The unwind.** A throw during the render phase interrupts the beginWork/completeWork traversal ([how-react-renders](./how-react-renders.md)) mid-tree. React catches it and walks **up the `return` chain** from the throwing fiber, looking for a class fiber that declares the boundary methods. Found: React records the error on that boundary, schedules it to re-render, and rendering resumes *from the boundary* — `getDerivedStateFromError` runs, the boundary's render returns the fallback, and the finished tree that eventually commits contains the fallback where the broken subtree would have been. The broken subtree's fibers are discarded; its cleanups run. Not found: the "boundary" is the root, and React's contract since 16 is deliberate — **unmount the entire tree** rather than leave half-committed UI lying about the app's state. A corrupted checkout form is worse than a blank page.
+### The unwind
 
-**The concurrent retry.** In an interruptible render, a throw might be an artifact of timing (a store mutated mid-slice, a tear) rather than a real bug. So before committing a fallback, React **retries the render synchronously** — no yielding, no interleaving. Only if the error reproduces does the boundary engage. Practical consequence: breakpoints and logs in a throwing component can fire twice for one committed fallback; that's the retry, not a double bug.
+A throw during the render phase interrupts the beginWork/completeWork traversal ([how-react-renders](./how-react-renders.md)) mid-tree. React catches it and walks **up the `return` chain** from the throwing fiber, looking for a class fiber that declares the boundary methods. Found: React records the error on that boundary, schedules it to re-render, and rendering resumes *from the boundary* — `getDerivedStateFromError` runs, the boundary's render returns the fallback, and the finished tree that eventually commits contains the fallback where the broken subtree would have been. The broken subtree's fibers are discarded; its cleanups run. Not found: the "boundary" is the root, and React's contract since 16 is deliberate — **unmount the entire tree** rather than leave half-committed UI lying about the app's state. A corrupted checkout form is worse than a blank page.
 
-**Commit-phase throws.** Errors from `useLayoutEffect`/`useEffect` setup or cleanup can't unwind a render that's already done — React catches them during the (layout or passive) flush and routes them to the nearest boundary the same way, scheduling its fallback in a follow-up render.
+### The concurrent retry
 
-**React 19's root-level reporting.** Before 19, centralized error telemetry meant a boundary at the root plus `window.onerror` glue. `createRoot` now takes the hooks directly:
+In an interruptible render, a throw might be an artifact of timing (a store mutated mid-slice, a tear) rather than a real bug. So before committing a fallback, React **retries the render synchronously** — no yielding, no interleaving. Only if the error reproduces does the boundary engage. Practical consequence: breakpoints and logs in a throwing component can fire twice for one committed fallback; that's the retry, not a double bug.
+
+### Commit-phase throws
+
+Errors from `useLayoutEffect`/`useEffect` setup or cleanup can't unwind a render that's already done — React catches them during the (layout or passive) flush and routes them to the nearest boundary the same way, scheduling its fallback in a follow-up render.
+
+### React 19's root-level reporting
+
+Before 19, centralized error telemetry meant a boundary at the root plus `window.onerror` glue. `createRoot` now takes the hooks directly:
 
 ```tsx
 // main.tsx
@@ -56,7 +64,9 @@ createRoot(document.getElementById("root")!, {
 
 Every render-pipeline error in the app now reaches exactly one reporting seam, boundary or not — and 19 also cleaned up the dev experience (one console entry with real context, not the old duplicate logs).
 
-**Why a class.** The boundary contract is "React calls *these methods on this fiber* during unwind" — and no hook exposes that seam; as of 19.2 none is planned into stability. Hence the standing convention from the [roadmap](../../roadmap.md): classes appear in this library exactly once, here, immediately wrapped:
+### Why a class
+
+The boundary contract is "React calls *these methods on this fiber* during unwind" — and no hook exposes that seam; as of 19.2 none is planned into stability. Hence the standing convention from the [roadmap](../../roadmap.md): classes appear in this library exactly once, here, immediately wrapped:
 
 ```tsx
 // The class, written once for understanding — you will import, not write, this.
@@ -239,15 +249,25 @@ Two habits worth copying: the boundary test asserts the **role="alert"** fallbac
 
 ## Real-world patterns
 
-**Placement: the granularity ladder.** Root boundary (full-page "something went wrong" — the last resort that should almost never render) → **route-level** (each page fails alone; in React Router data mode this is the router's own `errorElement`/`ErrorBoundary` per route, which also catches loader errors — [routing-react-router](../ecosystem/routing-react-router.md) *(Wave 4, planned)* owns that integration) → **feature/widget level** (this walkthrough — regions that are independently useful fail independently) → and no lower: a boundary per button is ceremony catching nothing render-shaped. The placement question is always "what's the largest region whose death this fallback adequately replaces?"
+### Placement: the granularity ladder
 
-**Reset design.** A fallback without an exit is a dead end wearing an apology. Three exits, composable: a **retry button** (`resetErrorBoundary`) for transient faults; **`resetKeys`** bound to the data identity the region renders (route params, filters, selected id) so navigation heals errors automatically; and **`onReset`** to clear whatever cached poison caused the throw — with a server cache in play, that's the `QueryErrorResetBoundary` pairing so the retry actually refetches instead of re-throwing from cache ([data-fetching-tanstack-query](../ecosystem/data-fetching-tanstack-query.md) *(Wave 4, planned)*).
+Root boundary (full-page "something went wrong" — the last resort that should almost never render) → **route-level** (each page fails alone; in React Router data mode this is the router's own `errorElement`/`ErrorBoundary` per route, which also catches loader errors — [routing-react-router](../ecosystem/routing-react-router.md) *(Wave 4, planned)* owns that integration) → **feature/widget level** (this walkthrough — regions that are independently useful fail independently) → and no lower: a boundary per button is ceremony catching nothing render-shaped. The placement question is always "what's the largest region whose death this fallback adequately replaces?"
 
-**The `try/catch` redirect, paid.** [rules-of-react](../foundations/rules-of-react.md) banned `try/catch` around hooks and promised the real strategy here. The division: **`try/catch` is for operations** — handlers and effects doing async work, where you catch, classify, and usually dispatch an error *state*. **Boundaries are for rendering** — the declarative phase can't be wrapped statement-by-statement (hooks break, and half-rendered output is exactly what React refuses to commit), so React gives you catch-as-a-component instead. If you feel the urge to `try/catch` inside render, you're either handling an expected case (make it state) or an unexpected one (let it throw to the boundary).
+### Reset design
 
-**The stale-chunk fallback.** The most common production boundary firing in SPAs isn't your code — it's `import()` rejecting after a deploy, when a lazily loaded route's chunk hash no longer exists. A route-level boundary that detects the chunk-load error shape and renders "A new version is available — **Reload**" converts a mystery white screen into a one-click recovery. (The `lazy`/Suspense mechanics belong to [suspense](../concurrent/suspense.md) *(Wave 3, planned)*; the boundary is the half you can ship today.)
+A fallback without an exit is a dead end wearing an apology. Three exits, composable: a **retry button** (`resetErrorBoundary`) for transient faults; **`resetKeys`** bound to the data identity the region renders (route params, filters, selected id) so navigation heals errors automatically; and **`onReset`** to clear whatever cached poison caused the throw — with a server cache in play, that's the `QueryErrorResetBoundary` pairing so the retry actually refetches instead of re-throwing from cache ([data-fetching-tanstack-query](../ecosystem/data-fetching-tanstack-query.md) *(Wave 4, planned)*).
 
-**Fallbacks stay dumb.** The fallback renders *instead of* the region that just proved the data can be poison — so it must not touch that data. Static text, the error message at most, a retry control. A fallback that formats `error.data.summary` is a second throw waiting, and *that* one propagates to the next boundary up.
+### The `try/catch` redirect, paid
+
+[rules-of-react](../foundations/rules-of-react.md) banned `try/catch` around hooks and promised the real strategy here. The division: **`try/catch` is for operations** — handlers and effects doing async work, where you catch, classify, and usually dispatch an error *state*. **Boundaries are for rendering** — the declarative phase can't be wrapped statement-by-statement (hooks break, and half-rendered output is exactly what React refuses to commit), so React gives you catch-as-a-component instead. If you feel the urge to `try/catch` inside render, you're either handling an expected case (make it state) or an unexpected one (let it throw to the boundary).
+
+### The stale-chunk fallback
+
+The most common production boundary firing in SPAs isn't your code — it's `import()` rejecting after a deploy, when a lazily loaded route's chunk hash no longer exists. A route-level boundary that detects the chunk-load error shape and renders "A new version is available — **Reload**" converts a mystery white screen into a one-click recovery. (The `lazy`/Suspense mechanics belong to [suspense](../concurrent/suspense.md) *(Wave 3, planned)*; the boundary is the half you can ship today.)
+
+### Fallbacks stay dumb
+
+The fallback renders *instead of* the region that just proved the data can be poison — so it must not touch that data. Static text, the error message at most, a retry control. A fallback that formats `error.data.summary` is a second throw waiting, and *that* one propagates to the next boundary up.
 
 ## Reference
 
