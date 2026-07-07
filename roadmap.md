@@ -31,7 +31,7 @@ Every article whose API changed across this arc gets a "How this evolved" sectio
 Rationale:
 
 1. **Fundamentals are framework-agnostic; frameworks blur them.** Learning `useEffect`, reconciliation, or Suspense *inside* Next.js means constantly disentangling React semantics from framework conventions (server/client boundary, router cache, `"use client"` directives). A learner can't tell which behavior belongs to whom. Client-side React first gives a clean mental model.
-2. **The client paradigm still dominates** real codebases and interviews. RSC is important but it's a genuinely different mental model — it deserves its own coherent arc (articles 27–28 + the `ssr-and-rsc` recipe track) once client React is solid, rather than leaking into every foundational article as caveats.
+2. **The client paradigm still dominates** real codebases and interviews. RSC is important but it's a genuinely different mental model — it deserves its own coherent arc (articles 25–26 + 33 + the `ssr-and-rsc` recipe track) once client React is solid, rather than leaking into every foundational article as caveats.
 3. **Vite 8 is the de facto non-framework baseline** — even the anti-SPA crowd concedes this is what you reach for when you want React-the-library.
 
 Adjacent stances locked with it:
