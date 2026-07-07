@@ -102,7 +102,7 @@ export function ProductList() {
 }
 ```
 
-Now Back, Forward, a pasted link, and "Clear filters" all Just Work, because there's nothing to keep in sync — the render reads whatever the URL currently says. The functional `setSearchParams(prev => …)` preserves the params you're not touching, and `{ replace: true }` keeps each filter keystroke out of the history stack. This is the whole fix: the mirror is gone. ([React Router's](../../ecosystem/routing-react-router.md#real-world-patterns) `useSearchParams` owns this API.)
+Now Back, Forward, a pasted link, and "Clear filters" all Just Work, because there's nothing to keep in sync — the render reads whatever the URL currently says. The functional `setSearchParams(prev => …)` preserves the params you're not touching, and `{ replace: true }` keeps each filter keystroke out of the history stack. This is the whole fix: the mirror is gone. ([React Router's](../../ecosystem/routing-react-router.md#api--type-reference) `useSearchParams` owns this API.)
 
 ### Stage 4 — Parse and validate the params
 
@@ -143,7 +143,7 @@ State belongs in the URL when it should **survive a refresh**, be **shareable**,
 
 ## See also
 
-- [Routing with React Router](../../ecosystem/routing-react-router.md#real-world-patterns) — the `useSearchParams` read/write model this recipe leans on.
+- [Routing with React Router](../../ecosystem/routing-react-router.md#api--type-reference) — the `useSearchParams` read/write model this recipe leans on.
 - [useReducer and state structure](../../state/usereducer-and-state-structure.md#derive-vs-mirror--the-deep-dive) — the derive-don't-mirror rule, here applied to the URL.
 - [TanStack Router](../../ecosystem/tanstack-router.md#search-param-validation) — typed search params that design this failure out.
 - [Recipe: back button loses scroll position](./back-button-scroll.md) *(planned)* — the sibling routing recipe; scroll restoration when the URL is the source of truth.

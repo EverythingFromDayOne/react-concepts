@@ -326,7 +326,9 @@ Three deliberate choices to read closely:
 
 ## Real-world patterns
 
-**The containment embassy, built out.** When you must host an imperative library — a map, a chart, a video engine — the pattern is a single component that acts as sovereign territory with a React-shaped border. Everything imperative lives inside; props cross the border inward as synchronization, events cross outward as callbacks, and *no imperative handle leaks out*:
+### The containment embassy
+
+When you must host an imperative library — a map, a chart, a video engine — the pattern is a single component that acts as sovereign territory with a React-shaped border. Everything imperative lives inside; props cross the border inward as synchronization, events cross outward as callbacks, and *no imperative handle leaks out*:
 
 ```tsx
 interface MapPanelProps {

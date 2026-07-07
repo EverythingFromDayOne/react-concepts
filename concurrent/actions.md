@@ -38,7 +38,7 @@ The unifying idea: a mutation has a **pending** phase, a **success** result, a *
 4. Publishes the submission state (`pending`, the `FormData`, method, action) into a **form-status context** that wraps the form's subtree.
 5. On success, **resets uncontrolled fields** (you can opt out with `requestFormReset` from `react-dom`, or by using controlled inputs whose value you own).
 
-Step 4 is the detail that explains `useFormStatus`'s odd placement rule, and step 3 is the through-line to everything else: it's the same async transition from [`concurrent-rendering`](./concurrent-rendering.md#real-world-patterns), now triggered by a submit and handed a `FormData`.
+Step 4 is the detail that explains `useFormStatus`'s odd placement rule, and step 3 is the through-line to everything else: it's the same async transition from [`concurrent-rendering`](./concurrent-rendering.md#async-transitions), now triggered by a submit and handed a `FormData`.
 
 ### `useActionState` — the reducer, productized
 

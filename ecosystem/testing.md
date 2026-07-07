@@ -29,7 +29,9 @@ The philosophy underneath all four, in RTL's words paraphrased: the more a test 
 
 ## How it works under the hood
 
-**The query priority ladder.** RTL's queries are ranked, and the ranking *is* the guidance — reach for the highest that fits:
+### The query priority ladder
+
+RTL's queries are ranked, and the ranking *is* the guidance — reach for the highest that fits:
 
 1. `getByRole` (with `{ name }`) — queries the **accessibility tree**, so it tests what a screen-reader user and a sighted user both perceive. The default.
 2. `getByLabelText` — form fields by their label (how users find inputs).

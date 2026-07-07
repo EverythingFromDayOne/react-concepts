@@ -423,7 +423,7 @@ Next.js is where the RSC model becomes a production app. In Next.js 16 the defin
 - [Server Components](../server/server-components.md) — the RSC model this article puts into production (boundary, serialization, payload).
 - [SSR and hydration](../server/ssr-and-hydration.md#streaming-and-selective-hydration) — the streaming fundamentals PPR builds on.
 - [Actions](../concurrent/actions.md#useactionstate--the-reducer-productized) — the client mutation machinery Server Actions plug into.
-- [Data fetching with TanStack Query](../ecosystem/data-fetching-tanstack-query.md#real-world-patterns) — the client cache the RSC→Query bridge hydrates.
+- [Data fetching with TanStack Query](../ecosystem/data-fetching-tanstack-query.md#how-this-evolved) — the client cache the RSC→Query bridge hydrates.
 - [Suspense](../concurrent/suspense.md) — the boundary that turns a dynamic subtree into a streamed one.
 - [Recipe: hydration mismatch on dates/random values](../recipes/ssr-and-rsc/hydration-mismatch.md) *(planned)* — opens the ssr-and-rsc recipe track this article gates.
 - [Recipe: `"use client"` sprawl](../recipes/ssr-and-rsc/use-client-sprawl.md) *(planned)* — keeping the client bundle small.

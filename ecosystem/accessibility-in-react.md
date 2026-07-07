@@ -44,7 +44,7 @@ Associations need matching IDs on both nodes (`htmlFor`/`id`, `aria-describedby`
 
 ### `inert`: the focus-trap primitive
 
-React 19 supports **`inert` as a boolean prop** (pre-19 needed a string-attribute workaround). `inert` removes an entire subtree from focus, clicks, tabbing, *and* the accessibility tree in one attribute — strictly more than `aria-hidden`, which hides from AT but leaves the subtree clickable and tabbable. When a modal opens, marking the rest of the page `inert` is the whole focus trap: focus physically cannot leave the dialog because everything else is gone from the tab order. Refs remain the escape hatch for the imperative `.focus()` call itself ([owned by the useref article](../effects/useref-and-the-dom.md#real-world-patterns)).
+React 19 supports **`inert` as a boolean prop** (pre-19 needed a string-attribute workaround). `inert` removes an entire subtree from focus, clicks, tabbing, *and* the accessibility tree in one attribute — strictly more than `aria-hidden`, which hides from AT but leaves the subtree clickable and tabbable. When a modal opens, marking the rest of the page `inert` is the whole focus trap: focus physically cannot leave the dialog because everything else is gone from the tab order. Refs remain the escape hatch for the imperative `.focus()` call itself ([owned by the useref article](../effects/useref-and-the-dom.md#the-containment-embassy)).
 
 ## Basic usage
 
@@ -290,9 +290,9 @@ Even done correctly, the modal has edge cases that will bite: iOS VoiceOver's ro
 
 **Live regions, precisely.** `role="status"` / `aria-live="polite"` waits for a pause (use for toasts, saved-confirmations, result counts); `role="alert"` / `aria-live="assertive"` interrupts (use sparingly, for errors). Two gotchas: the region must exist in the DOM *before* it's populated (insert empty, then set text), and `aria-atomic="true"` makes AT re-read the whole region rather than just the diff. Pair a polite region with [Suspense](../concurrent/suspense.md) fallbacks and action pending states to narrate async UI.
 
-**Semantics are orthogonal to styling.** A Tailwind-styled `<div>` that *looks* like a button is not a button — `className` never touches the accessibility tree ([the styling article](../ecosystem/styling-approaches.md#real-world-patterns) owns this boundary). Style the real element: `<button className="…">`. This is why "use a component library's Button" is good a11y advice and "copy the button's CSS onto a div" is a trap.
+**Semantics are orthogonal to styling.** A Tailwind-styled `<div>` that *looks* like a button is not a button — `className` never touches the accessibility tree ([the styling article](../ecosystem/styling-approaches.md#styling-is-orthogonal-to-the-compiler-and-to-a11y) owns this boundary). Style the real element: `<button className="…">`. This is why "use a component library's Button" is good a11y advice and "copy the button's CSS onto a div" is a trap.
 
-**Tests are an accessibility check.** Querying by role in RTL isn't just a testing style — `getByRole("button", { name: /save/i })` *fails* if your control has no accessible role or name, so a passing role-based test is a passing a11y smoke test ([the testing article](../ecosystem/testing.md#how-it-works-under-the-hood) established the query ladder; here's the payoff). Add `jest-axe` for a structural audit:
+**Tests are an accessibility check.** Querying by role in RTL isn't just a testing style — `getByRole("button", { name: /save/i })` *fails* if your control has no accessible role or name, so a passing role-based test is a passing a11y smoke test ([the testing article](../ecosystem/testing.md#the-query-priority-ladder) established the query ladder; here's the payoff). Add `jest-axe` for a structural audit:
 
 ```tsx
 import { axe } from "jest-axe";
@@ -365,11 +365,11 @@ React renders the DOM you write, accessible or not, so accessibility is a discip
 
 ## See also
 
-- [useref and the DOM](../effects/useref-and-the-dom.md#real-world-patterns) — the ref mechanics behind focus management.
+- [useref and the DOM](../effects/useref-and-the-dom.md#the-containment-embassy) — the ref mechanics behind focus management.
 - [Portals and the event system](../rendering/portals-and-the-event-system.md) — where the custom modal renders.
-- [Testing](../ecosystem/testing.md#how-it-works-under-the-hood) — role queries and `jest-axe` as the a11y regression gate.
+- [Testing](../ecosystem/testing.md#the-query-priority-ladder) — role queries and `jest-axe` as the a11y regression gate.
 - [Forms at scale](../forms/forms-at-scale.md#step-2--the-form-register-field-array-per-field-errors) / [controlled forms](../forms/forms-controlled-and-uncontrolled.md) — the validation flow whose output this wires for AT.
-- [Styling approaches](../ecosystem/styling-approaches.md#real-world-patterns) — why `className` never touches the accessibility tree.
+- [Styling approaches](../ecosystem/styling-approaches.md#styling-is-orthogonal-to-the-compiler-and-to-a11y) — why `className` never touches the accessibility tree.
 - [Routing (React Router)](../ecosystem/routing-react-router.md) — route-change focus management.
 
 ## References

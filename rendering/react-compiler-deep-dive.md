@@ -172,7 +172,7 @@ Note the preset surface is evolving quickly (the plugin recently slimmed to `rec
 
 ## Opting in and out — the accounting
 
-[`memoization-and-the-compiler`](./memoization-and-the-compiler.md#when-the-compiler-declines) introduced `"use no memo"`. Here's the full accounting of the levers, from whole-project down to a single function.
+[`memoization-and-the-compiler`](../foundations/rules-of-react.md#use-no-memo--the-labeled-exception) introduced `"use no memo"`. Here's the full accounting of the levers, from whole-project down to a single function.
 
 ### Compilation mode (project-wide)
 

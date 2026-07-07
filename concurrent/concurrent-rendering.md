@@ -310,7 +310,9 @@ They're the same lane mechanism from two ends: `useTransition` marks the *cause*
 
 **Pairing with the performance ladder.** Concurrent features are the *responsiveness* layer, not the *cost* layer. The [`typing-lag-rerender-storm`](../recipes/performance/typing-lag-rerender-storm.md) recipe's ladder — measure → structure → Compiler-verify → defer → do less → manual memo — puts `useDeferredValue` at the "defer" rung, *after* you've colocated state and let the Compiler memoize, and *before* the heavier structural fixes. If the list is 8,000 rows, the real answer is often virtualization ("do less" — render 30 rows, not 8,000) *and* a transition on top. They're complementary: virtualization cuts the render cost; the transition keeps input responsive during whatever cost remains.
 
-**Async transitions (forward pointer).** In React 19, the `startTransition` callback may be `async` — the transition stays pending across `await` boundaries until the awaited work and its resulting state updates settle:
+### Async transitions
+
+In React 19, the `startTransition` callback may be `async` — the transition stays pending across `await` boundaries until the awaited work and its resulting state updates settle:
 
 ```tsx
 startTransition(async () => {
