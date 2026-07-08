@@ -96,6 +96,15 @@ Numbering = reading order. Waves gate delivery (finish a wave before starting th
 
 Wave 4 items 33–36 are flexible in order; 27–32 are not (recipes depend on them).
 
+### Wave 5 — Architecture (micro-frontends) — additive, post-concept-track
+
+Added July 2026 (session 6). The 36-article track teaches React-the-library; this wave covers composing multiple independently-deployed React apps into one product. Decision-focused and deliberately honest: the dominant 2026 lesson is that most teams adopt micro-frontends too early and regret it, so both articles lead with when-NOT.
+
+37. `micro-frontends` — the decision. Micro-frontends as an *organizational* pattern, not a technical upgrade; the integration-style taxonomy (build-time package/monorepo · run-time via Module Federation · run-time via web components · server-side & edge composition · Next.js Multi-Zones · iframes); the decision table (structured monolith + Feature-Sliced Design → modular monorepo → runtime remotes) with the org-scale threshold (~4+ FE teams / ~50+ engineers); the version-skew tax (N remotes → N·(N−1)/2 compatibility combinations) and the shared-kernel contract (React/router/design-tokens/auth/i18n); cross-MFE shared state as the anti-pattern (the state-placement spine across the app boundary); the SSR/RSC intersection (server boundaries follow RSC rules — 25/26/33). Decision-not-tour. The anchor.
+38. `module-federation` — the practice (Vite 8 / Rolldown). Module Federation 2.0 via `@module-federation/vite` (Rolldown-native MF is landing — verify against the registry): host/remote, `exposes`/`remotes`/`shared` singletons, the `mf-manifest.json`, DTS type-sharing, dynamic remotes, per-remote error boundaries + fallback (17), route-level lazy loading, shared-dependency version governance, and the Server-Side Module Federation / RSC-across-origins note (25/26/33). Where the Vite-8 wiring gotcha lives (cf. 24). Depends on 37.
+
+Wave 5 is additive and does not gate anything in Waves 1–4; deliver 37 before 38. "Basic usage" is renamed **Minimal shapes** in 37 (decision-table micro-convention, as in 29 & 32).
+
 ---
 
 ## 4. Recipe tracks — priority order
@@ -112,6 +121,7 @@ Wave 4 items 33–36 are flexible in order; 27–32 are not (recipes depend on t
 | 8 | `real-time/` | WebSocket/SSE lifecycle vs. StrictMode is a genuinely hard problem | Double socket connections in dev; missed reconnection; stale closure in message handler |
 | 9 | `ssr-and-rsc/` | Deferred until articles 25–26 + 33 exist | Hydration mismatch on dates; `"use client"` sprawl; server action returns stale data |
 | 10 | `pwa-offline/` | Long tail | Cached shell serves stale app; offline mutation queue |
+| 11 | `micro-frontends/` | Additive with Wave 5; the failure modes that make teams regret federation | Two copies of React (singleton misconfig) → invalid-hook-call; a remote's breaking deploy crashes the host at runtime (version skew); a remote's `remoteEntry` 404/timeout blanks the whole shell (no isolation); CSS leaks across remotes; cross-remote shared-store coupling |
 
 Recipes begin after Wave 1 articles are complete, then run in parallel with Waves 2–4 (mirrors the angular-concepts pattern that worked).
 
@@ -133,6 +143,7 @@ Recipes begin after Wave 1 articles are complete, then run in parallel with Wave
 - **Testing:** Vitest + React Testing Library + user-event + MSW. Query by role first; `data-testid` as fallback only.
 - **Named exports**, co-located test files (`Component.test.tsx`).
 - **Legacy marker:** `// legacy: written for React <19 — modernized in the upgrade pass` (same convention, React-flavored).
+- **Micro-frontends (Wave 5)** obey every rule above. Cross-MFE shared state appears only as the anti-pattern — the state-placement spine across the app boundary: a shared *kernel* for config/design-tokens/auth/i18n, explicit contracts/events for the rest, never a cross-remote client store of server state. The ESM/import-map ("native federation") approach is framed generically — no Angular examples, no Angular package names.
 
 ### Conventions deliberately dropped from angular-concepts
 
