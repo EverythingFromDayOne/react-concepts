@@ -103,7 +103,7 @@ Two trade-offs to own, because virtualization has real costs:
 
 1. **Fixed vs dynamic row height.** A constant `estimateSize` for uniform rows; `measureElement` for variable content so the scrollbar and offsets stay accurate.
 2. **Virtualized grid/table.** Virtualize rows (and columns too, for very wide tables) with the total-size spacer and absolute positioning; sticky headers live outside the scroll window.
-3. **Infinite scroll + virtualization.** They compose: virtualize the rendered window *and* fetch the next page as you near the end ([`useInfiniteQuery`](../../ecosystem/data-fetching-tanstack-query.md#real-world-patterns)) — you never hold or mount the whole list.
+3. **Infinite scroll + virtualization.** They compose: virtualize the rendered window *and* fetch the next page as you near the end ([`useInfiniteQuery`](../../ecosystem/data-fetching-tanstack-query.md#infinite-queries)) — you never hold or mount the whole list.
 4. **Pagination as the alternative.** Discrete pages with controls avoid the find-in-page/a11y trade-offs entirely and are simpler; the right call when the UX doesn't need one continuous scroll.
 5. **Server-side filtering instead of scroll-to-find.** Often the better answer is to not ship 10,000 rows — filter/paginate on the server and virtualize the (smaller) result.
 
@@ -130,7 +130,7 @@ If the list is **short** — dozens, not thousands — virtualization buys nothi
 
 - [`performance-profiling`](../../ecosystem/performance-profiling.md#real-world-patterns) — measuring the long task and DOM node count before and after, so you confirm the freeze is gone.
 - [`memoization-and-the-compiler`](../../rendering/memoization-and-the-compiler.md#cost-model) — why memo (re-render cost) can't fix a mount-cost freeze.
-- [`data-fetching-tanstack-query`](../../ecosystem/data-fetching-tanstack-query.md#real-world-patterns) — infinite scroll and server-side pagination that compose with, or replace, virtualization.
+- [`data-fetching-tanstack-query`](../../ecosystem/data-fetching-tanstack-query.md#infinite-queries) — infinite scroll and server-side pagination that compose with, or replace, virtualization.
 - [`accessibility-in-react`](../../ecosystem/accessibility-in-react.md#real-world-patterns) — keeping a virtualized list accessible (`aria-rowcount`, in-app search).
 - [`route-splitting-bundle`](./route-splitting-bundle.md) — the download-cost sibling; this is the render-cost half of the performance hub.
 

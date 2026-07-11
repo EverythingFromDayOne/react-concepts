@@ -353,21 +353,125 @@ const { data, isPlaceholderData } = useQuery({
 });
 ```
 
+### Refetch triggers and dials
+
+`staleTime` only marks data **eligible** to refetch. Nothing network happens until a *trigger* fires while the data is stale (or you force one). The default triggers:
+
+| Trigger | Option | Default | Real-world use |
+| --- | --- | --- | --- |
+| Window / tab focus | `refetchOnWindowFocus` | `true` | Multi-tab dashboards that must converge when the user returns |
+| Observer remount | `refetchOnMount` | `true` | Navigating back to a page while data may be stale |
+| Network reconnect | `refetchOnReconnect` | `true` | Mobile / flaky networks |
+| Wall-clock polling | `refetchInterval` | `false` | Live scores, delivery ETA — only when *watching* needs continuous refresh |
+| Poll while hidden | `refetchIntervalInBackground` | `false` | Leave `false` unless the tab must keep polling when backgrounded (battery/server cost) |
+
+An idle user staring at a stale screen with no focus/mount/reconnect/`refetchInterval` will **never** see a network call — by design. If that surprises you, you wanted polling (or a push channel into `setQueryData`), not a shorter `staleTime`. The [`dashboard-never-updates-while-watching`](../recipes/data-fetching/dashboard-never-updates-while-watching.md) recipe owns the "stale but idle" symptom.
+
+Tier `staleTime` by data class rather than one global number: static catalogs → large / `Infinity`; product lists → minutes; wallet / stock / flash-sale → `0`. Pair with a modest global `retry` (1–2, not the aggressive default 3 on every query) so a downed API isn't DDoSed by every open tab.
+
+### `refetchOnMount`: `true` vs `'always'`
+
+Both run on mount. They differ on **fresh** cache:
+
+- **`true` (default):** refetch only if the cached data is **stale**. Fresh cache → instant paint, **zero** network.
+- **`'always'`:** refetch on every mount **even when fresh**. Cache still paints immediately (if `gcTime` hasn't GC'd it); a background fetch updates afterward.
+
+`gcTime` is independent: it decides whether *any* cache survives unmount to paint as a preview. `'always'` does **not** nullify `gcTime` — without a surviving entry you get a first-load spinner, then the forced fetch. Use `'always'` on checkout / wallet / coupon pages where a global 5-minute `staleTime` is too trusting; leave lists on `true`. Symptom: [`refetch-on-mount-always-spams`](../recipes/data-fetching/refetch-on-mount-always-spams.md).
+
+### Cancel vs invalidate
+
+Two verbs, opposite intents:
+
+- **`cancelQueries`** — *stop* an in-flight request (or mark observers cancelled). No new fetch. Used in `onMutate` so a late refetch can't overwrite an optimistic write, and when a user hits "Cancel upload."
+- **`invalidateQueries`** — mark matching queries **stale** and **refetch active ones**. Used after a successful (or settled) mutation so the server stays source of truth.
+
+Cancel without invalidate leaves you on whatever was last written (including an optimistic guess). Invalidate without cancelling an overlapping refetch can race your optimistic `setQueryData`. The optimistic contract needs **both**, in order: cancel → snapshot → set → (rollback) → invalidate on settle. Symptom confusion: [`cancel-vs-invalidate-confusion`](../recipes/data-fetching/cancel-vs-invalidate-confusion.md).
+
+### `mutate` vs `mutateAsync`
+
+`mutate` is fire-and-forget: lifecycle via `onSuccess` / `onError` / `onSettled` (or per-call callbacks). Query **swallows** the rejection — safe default for "click → toast → invalidate."
+
+`mutateAsync` returns a **Promise**. Use it when the caller must `await` a result: chained dependent mutations, `Promise.all` of uploads, or React Hook Form's `handleSubmit` needing to `setError` from a 422. **You** own the rejection — wrap in `try/catch` or an unhandled rejection can surface. Prefer `mutate` unless you need the Promise. Symptom: [`mutate-async-unhandled-rejection`](../recipes/data-fetching/mutate-async-unhandled-rejection.md).
+
+`mutationFn` takes the **variables** you pass to `mutate`/`mutateAsync` (one argument — pack multiples into an object). It does **not** receive Query's auto `signal` the way `queryFn` does; aborting a write is opt-in (you thread an `AbortController` yourself). See [`upload-cant-be-cancelled`](../recipes/data-fetching/upload-cant-be-cancelled.md).
+
+### Dynamic parallel queries with `useQueries`
+
+Independent fixed queries → multiple `useQuery` (alias the returns) or `useSuspenseQueries`. A **runtime-length** list of keys (cart line ids, selected user ids) cannot call `useQuery` inside `.map` — that violates the Rules of Hooks. Use **`useQueries`**:
+
+```tsx
+const results = useQueries({
+  queries: ids.map((id) => ({
+    queryKey: productKeys.detail(id),
+    queryFn: ({ signal }) => fetchProduct(id, signal),
+  })),
+});
+```
+
+Each entry fails/succeeds independently. Prefer **batching on the server** (`?ids=1,2,3`) when you control the API — one request beats N. Symptom: [`n-plus-one-usequery-in-map`](../recipes/data-fetching/n-plus-one-usequery-in-map.md). Wrap the options factory in a custom hook ([`custom-hooks`](../effects/custom-hooks.md)) so UI stays dumb.
+
+### Prefetch on intent
+
+`queryClient.prefetchQuery` / `usePrefetchQuery` warm the cache before navigation. Prefer **intent** (hover/focus after a short dwell, likely-next page) over prefetch-everything. Hover without debounce **hover-bombs** the server as the pointer skims a list — delay ~150–200ms and cancel on `mouseleave`. Always set a non-zero `staleTime` on the prefetch or the destination `useQuery` treats the warm entry as immediately stale and refetches anyway. Symptom: [`hover-prefetch-request-storm`](../recipes/data-fetching/hover-prefetch-request-storm.md).
+
+### Persisting the cache
+
+`persistQueryClient` + a storage persister (sync localStorage or IndexedDB) survives reload for instant paint / offline shell. **Defaults are dangerous:** plain-text localStorage of every successful query, including PII. Filter with `shouldDehydrateQuery` (allowlist public keys; deny `user` / `wallet` / tokens), scope with `buster: userId`, and on logout call `clear()` **and** `persister.removeClient()` ([`logout-leaves-stale-cache`](../recipes/auth/logout-leaves-stale-cache.md)). Prefer IndexedDB when payloads can exceed ~5MB. Symptom for the filter half: [`public-only-persist-filter`](../recipes/data-fetching/public-only-persist-filter.md).
+
+### Infinite queries
+
+`useInfiniteQuery` caches **pages** (`{ pages, pageParams }`), not a flat array. You supply `initialPageParam`, `getNextPageParam` (return `undefined` when exhausted), and call `fetchNextPage` from a sentinel (`IntersectionObserver` / `useInView`). **`maxPages`** caps retained pages so a deep scroll doesn't keep every page in RAM — pair with virtualization ([`virtualization-long-list`](../recipes/performance/virtualization-long-list.md)) so the DOM window stays small too. Bidirectional feeds add `getPreviousPageParam` + `fetchPreviousPage`. Suspense variant: `useSuspenseInfiniteQuery` (initial load via boundaries; `isFetchingNextPage` still local). Refresh without blanking: wrap `refetchQueries` in `startTransition` ([`suspense`](../concurrent/suspense.md#the-transition-interplay--holding-content-instead-of-flashing-a-spinner)). Symptoms: [`infinite-scroll-rams-the-tab`](../recipes/data-fetching/infinite-scroll-rams-the-tab.md), [`suspense-infinite-refresh-blanks-feed`](../recipes/data-fetching/suspense-infinite-refresh-blanks-feed.md).
+
+### Production defaults and cost
+
+Aggressive defaults (`staleTime: 0`, `retry: 3`, focus refetch everywhere) optimize for freshness at the expense of your bill. A production-shaped client often looks like:
+
+```tsx
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      gcTime: 5 * 60_000,
+      retry: 1,
+      refetchOnWindowFocus: true,
+      networkMode: "online", // or "offlineFirst" for flaky mobile — pause when offline
+    },
+  },
+});
+```
+
+Then **override per query**: checkout `'always'` / `staleTime: 0`; static config `staleTime: Infinity`; live widgets `refetchInterval`. Batch ID lists server-side instead of N `useQueries`. Debounce intent-prefetch. These dials are the cost layer; the mechanism stays the same.
+
+### Feature-shaped Query modules
+
+Don't sprinkle raw `queryKey` strings through JSX. Per feature (`features/products/`):
+
+1. **`queryKeys` / key factory** — hierarchical arrays for partial invalidate.
+2. **`*Api.ts`** — pure `fetch`/`axios` functions (accept `signal`).
+3. **`hooks/use*.ts`** — `useQuery` / `useMutation` / `queryOptions` wrappers (`staleTime`, `select`, …).
+4. **Components** — call the hook; no URLs, no key literals.
+
+Share one `queryOptions(...)` between route-loader prefetch and the component read. Cross-feature imports stay at the API/key layer, not into another feature's components. This is organization, not a new runtime concept — the cache still keys on the arrays you defined.
+
 ## API / type reference
 
 | Symbol | Shape | Notes |
 | --- | --- | --- |
-| `useQuery(options)` | `{ queryKey, queryFn, staleTime?, gcTime?, enabled?, select?, placeholderData?, retry?, throwOnError? }` | Returns `{ data, error, status, isPending, isError, isSuccess, isFetching, isPlaceholderData, refetch }`. Single object — no overloads in v5 |
+| `useQuery(options)` | `{ queryKey, queryFn, staleTime?, gcTime?, enabled?, select?, placeholderData?, retry?, refetchOnMount?, refetchOnWindowFocus?, refetchOnReconnect?, refetchInterval?, throwOnError? }` | Returns `{ data, error, status, isPending, isError, isSuccess, isFetching, isPlaceholderData, refetch }`. Single object — no overloads in v5 |
 | `status` / `fetchStatus` | `'pending'\|'error'\|'success'` / `'fetching'\|'paused'\|'idle'` | Two orthogonal axes; don't collapse them |
 | `staleTime` / `gcTime` | ms; defaults `0` / `300_000` | *When to refetch* vs *how long to keep unwatched data* |
+| `refetchOnMount` | `boolean \| 'always'` | `true` = if stale; `'always'` = even if fresh |
 | `useMutation(options)` | `{ mutationFn, onMutate?, onError?, onSuccess?, onSettled? }` | Returns `{ mutate, mutateAsync, isPending, isError, data, variables, reset }` |
 | optimistic contract | `onMutate` → `onError` → `onSettled` | cancel → snapshot → set → (rollback) → invalidate |
 | `useSuspenseQuery(options)` | like `useQuery`, **no** `enabled`/`placeholderData`/`throwOnError` | `data` never `undefined`; loading/error via boundaries |
 | `useSuspenseQueries({ queries })` | array in, array out | Parallel suspense — the anti-waterfall hook |
+| `useQueries({ queries })` | dynamic-length parallel queries | Runtime id lists — not `useQuery` inside `.map` |
+| `useInfiniteQuery` / `useSuspenseInfiniteQuery` | `{ pages, pageParams }` + `fetchNextPage` / `maxPages?` | Paginated / infinite scroll cache |
 | `usePrefetchQuery(options)` | returns nothing | Fire during render, before a Suspense boundary |
-| `useQueryClient()` | `QueryClient` | `.invalidateQueries` / `.setQueryData` / `.getQueryData` / `.cancelQueries` / `.prefetchQuery` |
+| `useQueryClient()` | `QueryClient` | `.invalidateQueries` / `.setQueryData` / `.getQueryData` / `.cancelQueries` / `.prefetchQuery` / `.clear` |
 | `queryOptions(options)` | typed options object | Share one definition across `useQuery`, prefetch, `setQueryData` |
 | `QueryErrorResetBoundary` | render-prop `{ reset }` | Bridge to `react-error-boundary`'s `onReset` |
+| `persistQueryClient` | `{ queryClient, persister, maxAge?, buster?, shouldDehydrateQuery? }` | Disk-backed cache; filter sensitive keys |
 
 ## Common mistakes
 
@@ -388,7 +492,7 @@ The arc is a slow separation of two things React originally smeared together. Ea
 
 v5 (the baseline here) sanded the API: one options object instead of overloads, the `loading→pending` / `isLoading→isPending` rename to free `isLoading` for "first fetch only," `cacheTime→gcTime`, `useErrorBoundary→throwOnError`, and — most relevant to this project — **stable Suspense hooks** (`useSuspenseQuery` and friends), retiring the old experimental `suspense: boolean` flag. That's what let [`use-and-promises`](../concurrent/use-and-promises.md) defer "the production version" here.
 
-And RSC doesn't retire any of it. [`server-components`](../server/server-components.md) render initial data on the server and run mutations there — but a Server Component can't refetch on window focus, hold an optimistic overlay, or manage a `staleTime` window, because it never runs on the client after the first paint. In an RSC app the division is: server components for the initial, static-ish read; Query for everything interactive and cache-shaped after that (there's even a streaming bridge for calling `useSuspenseQuery` inside client components under the App Router). Production RSC wiring is [`nextjs-and-rsc-in-practice`](../server/nextjs-and-rsc-in-practice.md)'s job *(planned)*; the boundary is the point here.
+And RSC doesn't retire any of it. [`server-components`](../server/server-components.md) render initial data on the server and run mutations there — but a Server Component can't refetch on window focus, hold an optimistic overlay, or manage a `staleTime` window, because it never runs on the client after the first paint. In an RSC app the division is: server components for the initial, static-ish read; Query for everything interactive and cache-shaped after that (there's even a streaming bridge for calling `useSuspenseQuery` inside client components under the App Router). Production RSC wiring is [`nextjs-and-rsc-in-practice`](../server/nextjs-and-rsc-in-practice.md)'s job; the boundary is the point here.
 
 ## Exercises
 
