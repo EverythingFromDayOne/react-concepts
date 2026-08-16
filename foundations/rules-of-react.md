@@ -1,5 +1,6 @@
 ---
 article_id: rules-of-react
+description: React's rules are the load-bearing assumptions of the hook list, StrictMode, concurrent rendering and the Compiler, not etiquette
 concept_folder: foundations
 wave: 1
 related:

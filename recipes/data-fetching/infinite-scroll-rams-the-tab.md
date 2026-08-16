@@ -1,5 +1,6 @@
 ---
 recipe_id: infinite-scroll-rams-the-tab
+description: An infinite feed has to page forever without keeping forever, which means capping retained pages as well as virtualizing the DOM
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: advanced

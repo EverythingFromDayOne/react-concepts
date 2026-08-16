@@ -1,5 +1,6 @@
 ---
 recipe_id: logout-leaves-stale-cache
+description: Clearing the token does not end the session, so logout needs one shared teardown that cancels, wipes and broadcasts across tabs
 track: auth
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: intermediate

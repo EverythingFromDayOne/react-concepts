@@ -1,5 +1,6 @@
 ---
 article_id: jsx-and-rendering
+description: JSX is sugar for function calls that return plain objects, and reading it that way dissolves a whole class of React confusion
 concept_folder: foundations
 wave: 1
 related:

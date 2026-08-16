@@ -1,5 +1,6 @@
 ---
 article_id: accessibility-in-react
+description: React ships inaccessible DOM as happily as accessible DOM, so almost every win comes from not fighting the platform
 concept_folder: ecosystem
 wave: 4
 related:

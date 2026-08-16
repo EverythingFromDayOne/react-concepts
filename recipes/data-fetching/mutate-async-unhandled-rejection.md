@@ -1,5 +1,6 @@
 ---
 recipe_id: mutate-async-unhandled-rejection
+description: Default to mutate and reach for mutateAsync only when you genuinely need a promise, because its rejections are yours to catch
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: intermediate

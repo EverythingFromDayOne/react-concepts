@@ -1,5 +1,6 @@
 ---
 recipe_id: server-action-stale-data
+description: A successful write still shows stale UI until you invalidate the exact cache it came from, and the client cache is a second one
 track: ssr-and-rsc
 primary_concept: server/nextjs-and-rsc-in-practice
 difficulty: intermediate

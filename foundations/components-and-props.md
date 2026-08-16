@@ -1,5 +1,6 @@
 ---
 article_id: components-and-props
+description: A component's props type is its public API, and designing it well is what makes invalid usage fail to compile instead of at runtime
 concept_folder: foundations
 wave: 1
 related:

@@ -1,5 +1,6 @@
 ---
 article_id: memoization-and-the-compiler
+description: React Compiler inverts the memoization deal, so the job is now verifying it worked rather than hand-placing memo and useMemo
 concept_folder: rendering
 wave: 2
 related:

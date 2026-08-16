@@ -1,5 +1,6 @@
 ---
 recipe_id: double-submit-and-optimistic-like
+description: Client pending state stops the second click, but only a server idempotency key actually prevents the duplicate order
 track: forms-and-ux
 primary_concept: concurrent/actions
 related:

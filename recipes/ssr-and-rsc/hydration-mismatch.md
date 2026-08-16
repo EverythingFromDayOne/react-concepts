@@ -1,5 +1,6 @@
 ---
 recipe_id: hydration-mismatch
+description: Hydration errors come from environment-divergent values in the first render, so read time, locale and storage only after mount
 track: ssr-and-rsc
 primary_concept: server/ssr-and-hydration
 difficulty: intermediate

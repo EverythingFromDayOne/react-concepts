@@ -1,5 +1,6 @@
 ---
 article_id: tanstack-router
+description: The capability React Router has no clean answer for is validated, typed search params, and it costs a generated route tree
 concept_folder: ecosystem
 wave: 4
 related:

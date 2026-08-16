@@ -1,5 +1,6 @@
 ---
 recipe_id: back-button-scroll
+description: Scroll restoration needs the list data loaded before render, otherwise the router restores a position the page does not have yet
 track: routing
 primary_concept: ecosystem/routing-react-router
 difficulty: intermediate

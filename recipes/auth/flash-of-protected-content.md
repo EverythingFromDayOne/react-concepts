@@ -1,5 +1,6 @@
 ---
 recipe_id: flash-of-protected-content
+description: Auth has three states, not two, and deciding in a route loader before the protected component mounts is what removes the flash
 track: auth
 primary_concept: ecosystem/routing-react-router
 difficulty: intermediate

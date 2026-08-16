@@ -1,5 +1,6 @@
 ---
 article_id: useref-and-the-dom
+description: State is for values that drive renders and refs are for values that survive them, and React 19 removed most of the DOM ceremony
 concept_folder: effects
 wave: 2
 related:

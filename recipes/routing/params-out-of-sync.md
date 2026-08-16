@@ -1,5 +1,6 @@
 ---
 recipe_id: params-out-of-sync
+description: Mirroring the URL into state is what makes filters vanish on Back, so derive from the address bar during render instead
 track: routing
 primary_concept: ecosystem/routing-react-router
 difficulty: intermediate

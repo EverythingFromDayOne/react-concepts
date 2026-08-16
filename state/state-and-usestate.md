@@ -1,5 +1,6 @@
 ---
 article_id: state-and-usestate
+description: State is a snapshot plus a queue, and every classic useState confusion comes from reading it as an ordinary JavaScript variable
 concept_folder: state
 wave: 1
 related:

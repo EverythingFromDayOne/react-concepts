@@ -1,5 +1,6 @@
 ---
 article_id: how-react-renders
+description: Render is pure and disposable while commit is synchronous and atomic, and that split explains most of what React seems to do arbitrarily
 concept_folder: rendering
 wave: 2
 related:

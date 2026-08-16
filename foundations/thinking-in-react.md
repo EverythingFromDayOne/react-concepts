@@ -1,5 +1,6 @@
 ---
 article_id: thinking-in-react
+description: React bets that your UI is a function of state, and most React bugs come from fighting that bet rather than from the API
 concept_folder: foundations
 wave: 1
 related:

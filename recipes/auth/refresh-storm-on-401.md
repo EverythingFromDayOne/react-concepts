@@ -1,5 +1,6 @@
 ---
 recipe_id: refresh-storm-on-401
+description: Parallel 401s each triggering their own token refresh is what logs the user out, and a single-flight refresh is the fix
 track: auth
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: advanced

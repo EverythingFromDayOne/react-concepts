@@ -1,5 +1,6 @@
 ---
 article_id: micro-frontends
+description: Micro-frontends buy independent deployment for independent teams, and most teams that reach for them do so too early
 concept_folder: architecture
 wave: 5
 related:

@@ -1,5 +1,6 @@
 ---
 recipe_id: upload-cant-be-cancelled
+description: Mutations do not get the automatic abort signal queries do, so a working Cancel means threading your own controller through
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: intermediate

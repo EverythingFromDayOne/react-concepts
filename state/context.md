@@ -1,5 +1,6 @@
 ---
 article_id: context
+description: Context is a transport, not a store, so every reader re-renders on every change and nothing you wrap around a reader prevents it
 concept_folder: state
 wave: 2
 related:

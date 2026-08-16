@@ -1,5 +1,6 @@
 ---
 article_id: nextjs-and-rsc-in-practice
+description: Next 16 made caching opt-in, so everything is dynamic by default and the build errors on uncached request-time data outside Suspense
 concept_folder: server
 wave: 4
 related:

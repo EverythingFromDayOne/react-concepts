@@ -1,5 +1,6 @@
 ---
 recipe_id: version-skew-breaks-host
+description: A remote's exposed props are a versioned public API, so compatibility has to be checked at runtime and evolved additively
 track: micro-frontends
 primary_concept: architecture/module-federation
 difficulty: advanced

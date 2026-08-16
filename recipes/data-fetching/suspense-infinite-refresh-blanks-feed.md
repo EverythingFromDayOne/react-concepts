@@ -1,5 +1,6 @@
 ---
 recipe_id: suspense-infinite-refresh-blanks-feed
+description: A suspending refetch hides the list unless it runs in a transition, and Retry only works if the cached error is reset with it
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: advanced

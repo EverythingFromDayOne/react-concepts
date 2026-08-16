@@ -1,5 +1,6 @@
 ---
 article_id: component-composition
+description: Composition rests on the owner versus parent distinction, and the ladder from children to render props is climbed only as far as forced
 concept_folder: foundations
 wave: 1
 related:

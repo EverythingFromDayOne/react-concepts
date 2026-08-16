@@ -1,5 +1,6 @@
 ---
 article_id: forms-controlled-and-uncontrolled
+description: Controlled versus uncontrolled is a per-field decision, settled by whether anything needs the value before the form is submitted
 concept_folder: forms
 wave: 1
 related:

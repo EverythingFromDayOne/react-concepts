@@ -1,5 +1,6 @@
 ---
 article_id: portals-and-the-event-system
+description: A portal splits the React tree from the DOM tree, and every portal question reduces to asking which of the two governs the behavior
 concept_folder: rendering
 wave: 2
 related:

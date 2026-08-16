@@ -1,5 +1,6 @@
 ---
 article_id: conditional-rendering-and-events
+description: Branching and event handling look trivial and hide real machinery, from unmount-versus-hide decisions to blur firing before click
 concept_folder: foundations
 wave: 1
 related:
