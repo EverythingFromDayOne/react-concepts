@@ -1,5 +1,6 @@
 ---
 recipe_id: n-plus-one-usequery-in-map
+description: A runtime-length list of queries needs useQueries or a batched endpoint, because calling useQuery inside a map breaks the hook rules
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: intermediate

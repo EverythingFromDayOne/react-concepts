@@ -1,5 +1,6 @@
 ---
 recipe_id: typing-lag-rerender-storm
+description: The fix for a typing-lag re-render storm is structural, and the diff contains no hand-written memo, useMemo or useCallback at all
 track: performance
 primary_concept: foundations/component-composition
 related:

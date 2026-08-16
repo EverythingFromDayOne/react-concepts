@@ -1,5 +1,6 @@
 ---
 recipe_id: public-only-persist-filter
+description: Persisting the query cache is safe only as an allowlist of public data with a user-scoped buster that logout actually clears
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: advanced

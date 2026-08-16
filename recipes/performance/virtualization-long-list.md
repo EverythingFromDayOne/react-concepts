@@ -1,5 +1,6 @@
 ---
 recipe_id: virtualization-long-list
+description: Ten thousand rows in one synchronous commit is the freeze, and virtualizing down to the visible window is what removes it
 track: performance
 primary_concept: ecosystem/performance-profiling
 difficulty: intermediate

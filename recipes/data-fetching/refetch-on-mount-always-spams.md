@@ -1,5 +1,6 @@
 ---
 recipe_id: refetch-on-mount-always-spams
+description: Force a refetch on mount only where correctness demands it, and keep the cached data so the screen still paints while it runs
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: intermediate

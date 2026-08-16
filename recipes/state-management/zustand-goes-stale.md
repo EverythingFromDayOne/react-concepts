@@ -1,5 +1,6 @@
 ---
 recipe_id: zustand-goes-stale
+description: Server state in a client store goes stale with nothing to refresh it, which is why a query cache owns it and Zustand keeps the rest
 track: state-management
 primary_concept: ecosystem/state-management-landscape
 difficulty: intermediate

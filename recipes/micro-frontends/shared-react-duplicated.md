@@ -1,5 +1,6 @@
 ---
 recipe_id: shared-react-duplicated
+description: An invalid hook call only inside the shell means two copies of React, so federation has to treat React as a strict singleton
 track: micro-frontends
 primary_concept: architecture/module-federation
 difficulty: advanced

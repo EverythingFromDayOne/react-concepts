@@ -1,5 +1,6 @@
 ---
 article_id: custom-hooks
+description: A custom hook buys a name and a boundary, never shared state, and the craft is what you extract rather than how you extract it
 concept_folder: effects
 wave: 2
 related:

@@ -1,5 +1,6 @@
 ---
 article_id: module-federation
+description: Module Federation is runtime code sharing, and sharing exactly one React across host and remote is what decides whether it works
 concept_folder: architecture
 wave: 5
 related:

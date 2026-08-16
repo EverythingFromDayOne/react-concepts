@@ -1,5 +1,6 @@
 ---
 recipe_id: dashboard-never-updates-while-watching
+description: Stale does not mean refetch, so a watched dashboard needs an interval on that surface alone rather than a global polling default
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: intermediate

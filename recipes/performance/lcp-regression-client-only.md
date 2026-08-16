@@ -1,5 +1,6 @@
 ---
 recipe_id: lcp-regression-client-only
+description: A client-rendered hero cannot paint until the JavaScript does, so the LCP element has to be in the initial server response
 track: performance
 primary_concept: ecosystem/performance-profiling
 difficulty: intermediate

@@ -1,5 +1,6 @@
 ---
 article_id: effects-and-synchronization
+description: Reading useEffect as a lifecycle hook rather than a synchronization contract is the root of nearly every way it gets misused
 concept_folder: effects
 wave: 1
 related:

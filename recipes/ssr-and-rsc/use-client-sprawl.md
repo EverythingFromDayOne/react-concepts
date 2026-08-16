@@ -1,5 +1,6 @@
 ---
 recipe_id: use-client-sprawl
+description: The use client directive marks a boundary rather than a file, so everything below it ships and the boundary belongs at the leaves
 track: ssr-and-rsc
 primary_concept: server/server-components
 difficulty: intermediate

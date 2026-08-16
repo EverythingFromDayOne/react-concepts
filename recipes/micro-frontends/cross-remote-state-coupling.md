@@ -1,5 +1,6 @@
 ---
 recipe_id: cross-remote-state-coupling
+description: A shared mutable store re-couples independently deployed remotes, so share server truth and versioned events instead of state
 track: micro-frontends
 primary_concept: architecture/micro-frontends
 difficulty: advanced

@@ -1,5 +1,6 @@
 ---
 recipe_id: spinner-never-resolves-after-unmount
+description: A spinner that never resolves is a loading flag that outlived its request, so derive loading from the request rather than storing it
 track: data-fetching
 primary_concept: effects/effects-and-synchronization
 difficulty: intermediate

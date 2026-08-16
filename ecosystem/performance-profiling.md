@@ -1,5 +1,6 @@
 ---
 article_id: performance-profiling
+description: Profiling is measurement, not optimization, and conflating the React layer with the browser layer is how it usually goes wrong
 concept_folder: ecosystem
 wave: 4
 related:

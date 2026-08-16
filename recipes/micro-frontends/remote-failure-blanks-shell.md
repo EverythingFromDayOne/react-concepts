@@ -1,5 +1,6 @@
 ---
 recipe_id: remote-failure-blanks-shell
+description: A remote that fails to load should degrade inside its own slot, or a three-minute CDN blip becomes a full product outage
 track: micro-frontends
 primary_concept: architecture/module-federation
 difficulty: advanced

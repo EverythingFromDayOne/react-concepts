@@ -1,5 +1,6 @@
 ---
 article_id: rendering-lists-and-keys
+description: A key is an item's identity across renders, and identity decides what persists, which is why index keys corrupt state in real lists
 concept_folder: rendering
 wave: 1
 related:

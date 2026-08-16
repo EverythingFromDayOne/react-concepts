@@ -1,5 +1,6 @@
 ---
 recipe_id: lazy-route-flashes-blank
+description: Keep the current page on screen while the next chunk loads, because unmounting it first is what turns code splitting into a flash
 track: routing
 primary_concept: ecosystem/routing-react-router
 difficulty: intermediate

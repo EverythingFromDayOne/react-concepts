@@ -1,5 +1,6 @@
 ---
 recipe_id: context-rerenders-the-whole-tree
+description: Splitting context by change cadence and pushing reads down to leaves fixes most context re-render storms, until it stops being enough
 track: state-management
 primary_concept: state/context
 difficulty: intermediate

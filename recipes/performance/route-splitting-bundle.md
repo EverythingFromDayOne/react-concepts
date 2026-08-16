@@ -1,5 +1,6 @@
 ---
 recipe_id: route-splitting-bundle
+description: The initial download should carry only the first screen, with routes and heavy libraries pulled in on navigation or interaction
 track: performance
 primary_concept: ecosystem/performance-profiling
 difficulty: intermediate

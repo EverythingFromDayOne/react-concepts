@@ -1,5 +1,6 @@
 ---
 recipe_id: css-leaks-across-remotes
+description: Global selectors in one remote restyle another once load order decides the cascade, so scoping has to be structural not careful
 track: micro-frontends
 primary_concept: ecosystem/styling-approaches
 difficulty: intermediate

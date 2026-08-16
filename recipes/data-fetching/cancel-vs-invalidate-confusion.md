@@ -1,5 +1,6 @@
 ---
 recipe_id: cancel-vs-invalidate-confusion
+description: Cancel stops in-flight work and invalidate marks stale and refetches, and an optimistic mutation needs both in the right order
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: foundational

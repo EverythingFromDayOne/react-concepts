@@ -1,5 +1,6 @@
 ---
 recipe_id: search-race-condition
+description: Search-as-you-type needs a race policy, not just a debounce, because the network will happily deliver an old query last
 track: data-fetching
 primary_concept: effects/effects-and-synchronization
 related:

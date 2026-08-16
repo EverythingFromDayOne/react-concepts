@@ -1,5 +1,6 @@
 ---
 article_id: escape-hatches-audit
+description: Three escape hatches exist because the ordinary tools cannot wait, and useLayoutEffect, useSyncExternalStore and flushSync each charge for it
 concept_folder: effects
 wave: 2
 related:

@@ -1,5 +1,6 @@
 ---
 recipe_id: hover-prefetch-request-storm
+description: Prefetch on intent rather than on hover, and give it a real staleTime, or the warm cache gets refetched the moment it is used
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: intermediate

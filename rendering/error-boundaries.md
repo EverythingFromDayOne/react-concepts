@@ -1,5 +1,6 @@
 ---
 article_id: error-boundaries
+description: Without a boundary a single throw during render unmounts the entire tree, and the real skill is telling error state from error throws
 concept_folder: rendering
 wave: 2
 related:

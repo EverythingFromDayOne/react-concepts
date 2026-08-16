@@ -1,5 +1,6 @@
 ---
 article_id: usereducer-and-state-structure
+description: The choice is not useState versus useReducer but where the rules live, and most reducer pain turns out to be state shape pain
 concept_folder: state
 wave: 2
 related:
