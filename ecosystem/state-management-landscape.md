@@ -1,5 +1,7 @@
 ---
 article_id: state-management-landscape
+description: |-
+  "Which state management library should I use?" is almost always the wrong first question.
 concept_folder: ecosystem
 wave: 4
 related:
@@ -13,6 +15,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# State management landscape
 
 > **Lead with this:** "Which state management library should I use?" is almost always the wrong first question. The right one is "what *kind* of state is this?" — because the state-placement rule already routes most of it away from any library at all. Server data goes to a query cache, form-shaped mutations go to Actions, static config goes to context, and local UI state stays in `useState`. What's left after those four take their share is a small residue — cross-cutting *client* state — and *that* is the only thing Zustand, Jotai, and Redux are competing for. This article is a decision table for that residue, not a tour of each library.
 

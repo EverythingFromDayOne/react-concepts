@@ -1,5 +1,6 @@
 ---
 article_id: react-compiler-deep-dive
+description: You turned on React Compiler. Some components show the ✨ badge in DevTools; some don't.
 concept_folder: rendering
 wave: 3
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# React Compiler deep dive
 
 > **Lead with this.** You turned on React Compiler. Some components show the ✨ badge in DevTools; some don't. Nobody told you why the un-badged ones opted out, or whether that's a bug you caused or a decision the compiler made. Worse, on a fresh Vite 8 project you followed a tutorial, the badge never appeared at all, and there was no error — the compiler just silently wasn't running, because the tutorial showed the Babel wiring that Vite 8 deleted. This article is the deep dive [`memoization-and-the-compiler`](./memoization-and-the-compiler.md) pointed forward to: what the compiler actually does to your code, *why* it sometimes refuses to compile a component (and why refusing is the safe outcome), the exact Vite 8 / `@rolldown/plugin-babel` wiring that most guides still get wrong, and how the ESLint plugin turns "it silently bailed" into "here's the line to fix." [`memoization-and-the-compiler`](./memoization-and-the-compiler.md) owns *when and why* to memoize and the manual APIs; this owns the compiler as a program that rewrites your components.
 

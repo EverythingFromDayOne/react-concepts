@@ -1,5 +1,6 @@
 ---
 recipe_id: request-waterfall
+description: a product page that loads in one round-trip's worth of time instead of four stacked back-to-back. You'll learn to see a request waterfall (it's invisible on localhost), tell an accidental one from a real data dependency, and flatten it with parallel queries, a route loader, or an API change.
 track: data-fetching
 primary_concept: ecosystem/data-fetching-tanstack-query
 difficulty: advanced
@@ -14,6 +15,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Request waterfall
 
 > **What you'll build:** a product page that loads in one round-trip's worth of time instead of four stacked back-to-back. You'll learn to *see* a request waterfall (it's invisible on localhost), tell an accidental one from a real data dependency, and flatten it with the right tool — parallel queries, a route loader, or an API change — instead of the wrong one.
 

@@ -1,5 +1,6 @@
 ---
 recipe_id: strictmode-double-mount
+description: a product page that fires **one** request per view instead of two, and the diagnostic habit to tell a *dev-only StrictMode fire drill* apart from a *real duplicate that ships to production*. You'll fix the read path with abort-and-ignore and hand the problem to a query cache.
 track: data-fetching
 primary_concept: effects/effects-and-synchronization
 difficulty: intermediate
@@ -14,6 +15,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# StrictMode double mount
 
 > **What you'll build:** a product page that fires **one** request per view instead of two — and the diagnostic habit to tell a *dev-only StrictMode fire drill* apart from a *real duplicate that ships to production*. You'll fix the read path with the locked abort-and-ignore pattern, classify the write path separately, and hand the whole problem off to a query cache that dedupes by key.
 

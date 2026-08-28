@@ -1,5 +1,6 @@
 ---
 article_id: concurrent-rendering
+description: You have a search box over 8,000 rows. Each keystroke re-renders the list, and the render costs ~120ms.
 concept_folder: concurrent
 wave: 3
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Concurrent rendering
 
 > **Lead with this.** You have a search box over 8,000 rows. Each keystroke re-renders the list, and the render costs ~120ms. You already memoized the rows and let the Compiler do its thing — the render is genuinely that expensive, not accidentally wasteful. So the input freezes: you type "reconcil" and the letters land in three bursts, the caret stutters, and the browser reports INP spikes of 240ms. There is no memoization move left. The problem isn't *how much* work the render does — it's that the work is **blocking the one interaction the user cares about**. Concurrent rendering is the tool for exactly this: it lets React keep the input at 60fps while the expensive list render happens at a lower priority, interruptibly, without you touching the cost of the render itself.
 

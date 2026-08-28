@@ -1,5 +1,6 @@
 ---
 article_id: data-fetching-tanstack-query
+description: Server state is not application state. It lives on a machine you don't control, it goes stale the instant you read it, and two components that need it should never fetch it twice.
 concept_folder: ecosystem
 wave: 4
 related:
@@ -14,6 +15,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Data fetching with TanStack Query
 
 > **Lead with this:** Server state is not application state. It lives on a machine you don't control, it goes stale the instant you read it, and two components that need it should never fetch it twice. TanStack Query is the cache that owns that category — and once it does, an entire class of `useEffect` fetching bugs (races, dedup, stale reads, manual loading flags) stops being your problem. This article is where the state-placement rule's "server state never in a client store" clause finally cashes out.
 

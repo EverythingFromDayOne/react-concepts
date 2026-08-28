@@ -1,5 +1,6 @@
 ---
 article_id: routing-react-router
+description: In data mode, the router stops being a `URL -> component` switch and becomes a `URL -> (data + mutation + error + pending)` layer. A route's data is fetched before its component renders, and loader failures land in a dedicated error channel.
 concept_folder: ecosystem
 wave: 4
 related:
@@ -14,6 +15,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Routing with React Router
 
 > **Lead with this:** In data mode, the router stops being a `URL → component` switch and becomes a `URL → (data + mutation + error + pending)` layer. A route's data is fetched *before* its component renders, mutations go through the route instead of hand-rolled `useState`, and loader failures land in a dedicated error channel that has nothing to do with React's render-time error boundaries. Getting the two channels straight is most of the battle.
 

@@ -1,5 +1,6 @@
 ---
 article_id: use-and-promises
+description: "Every hook you've met has one iron rule: call it at the top level, unconditionally, in the same order every render ([`rules-of-react`](. ."
 concept_folder: concurrent
 wave: 3
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# use() and Promises
 
 > **Lead with this.** Every hook you've met has one iron rule: call it at the top level, unconditionally, in the same order every render ([`rules-of-react`](../foundations/rules-of-react.md)). `use()` is the deliberate exception — you can call it inside an `if`, inside a loop, after an early return. That's not a loophole React forgot to close; it's the whole design. `use()` reads a **resource** (a promise or a context) at the moment you call it, and reading a resource doesn't require a persistent per-render slot the way `useState` does. Because it needs no slot, it needs no stable call order. This article is where that claim gets earned — and where the promise you hand `use()` has one non-negotiable requirement (it must be stable across renders) that, when violated, produces the "fallback that never resolves" bug from [`suspense`](./suspense.md).
 

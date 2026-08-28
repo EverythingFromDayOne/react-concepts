@@ -1,5 +1,6 @@
 ---
 article_id: server-components
+description: You added a 300 KB syntax-highlighting library to render code blocks in a blog post. It works — and it's now in every user's bundle, parsed and evaluated on their phone, even though nothing about highlighting is interactive.
 concept_folder: server
 wave: 3
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Server Components
 
 > **Lead with this.** You added a 300 KB syntax-highlighting library to render code blocks in a blog post. It works — and it's now in every user's bundle, parsed and evaluated on their phone, even though nothing about highlighting is interactive. Or: you're fetching data in a parent, threading it through three layers of props and an effect, when the component that actually needs it could just read the database. React Server Components answer both. An RSC runs **only on the server** — its code never ships to the browser, it can `await` your database directly, and it hands the client nothing but the finished markup and the small islands that actually need to be interactive. The mental shift is the whole thing: **not every component needs to run in the browser.** This article is the model — where components run, what crosses the boundary between server and client, and what dies at that boundary. Running it in production is a framework's job ([`nextjs-and-rsc-in-practice`](./nextjs-and-rsc-in-practice.md)); this is the model that framework implements.
 

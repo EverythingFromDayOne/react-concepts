@@ -1,5 +1,6 @@
 ---
 article_id: testing
+description: Test what the user does, not how the component does it. A test that asserts on internal state or class names breaks the moment you refactor — even when nothing the user sees changed.
 concept_folder: ecosystem
 wave: 4
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Testing
 
 > **Lead with this:** Test what the user does, not how the component does it. A test that asserts on internal state or class names breaks the moment you refactor — even when nothing the user sees changed. A test that clicks a button by its accessible name and checks what appears on screen survives the refactor and catches the regression. The whole stack — Vitest to run, React Testing Library to query, user-event to interact, MSW to mock the network — exists to make behavior-testing the path of least resistance. This article is the full toolchain that [`custom-hooks`](../effects/custom-hooks.md) previewed with `renderHook` and deferred.
 

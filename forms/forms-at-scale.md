@@ -1,5 +1,6 @@
 ---
 article_id: forms-at-scale
+description: React 19's form Actions own the *submission* lifecycle — submit, pending, optimistic, error. React Hook Form owns the *field* lifecycle — per-key validation, touched/dirty state, field arrays, cross-field rules.
 concept_folder: forms
 wave: 4
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Forms at scale
 
 > **Lead with this:** React 19's form Actions own the *submission* lifecycle — submit, pending, optimistic, error. React Hook Form owns the *field* lifecycle — per-key validation, touched/dirty state, field arrays, cross-field rules. The decision isn't "which library is better"; it's "where is the complexity — in the mutation or in the fields?" A login form is submission-shaped; reach for Actions. A 30-field onboarding form with a dynamic list of team invites is field-shaped; reach for RHF. This article draws that line and shows RHF + Zod doing the field-heavy half, with one schema validating both the client and the server.
 

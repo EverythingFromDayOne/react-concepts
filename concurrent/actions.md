@@ -1,5 +1,6 @@
 ---
 article_id: actions
+description: "Every form you wrote before React 19 reinvented the same four things by hand: a `isSubmitting` flag toggled around the request, a `try/catch` to catch failures into an error state, a manual optimistic update, and a `preventDefault` + `FormData` dance. Actions collapse all four into primitives."
 concept_folder: concurrent
 wave: 3
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Actions
 
 > **Lead with this.** Every form you wrote before React 19 reinvented the same four things by hand: a `isSubmitting` flag toggled around the request, a `try/catch` to catch failures into an error state, a manual optimistic update with a manual rollback in the `catch`, and a `preventDefault` + `FormData` dance to read the fields. Actions collapse all four into primitives. An **Action** is just an async function run inside a transition ([`concurrent-rendering`](./concurrent-rendering.md) built the substrate: "an Action is an async transition with a form-shaped reducer wrapped around it"). React manages the pending flag, threads the state, surfaces the errors, and reverts the optimistic overlay — so the form code becomes the *logic* and nothing else. This article is the mechanism under `useActionState`, `useFormStatus`, and `useOptimistic`; the [`double-submit-and-optimistic-like`](../recipes/forms-and-ux/double-submit-and-optimistic-like.md) recipe already uses these APIs against a real bug — here's what they're doing underneath.
 

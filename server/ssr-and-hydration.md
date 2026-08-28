@@ -1,5 +1,6 @@
 ---
 article_id: ssr-and-hydration
+description: Three symptoms, one root cause. Your app renders fast from the server, then the console throws a hydration mismatch and a chunk of the page flickers and re-renders on the client.
 concept_folder: server
 wave: 3
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# SSR and hydration
 
 > **Lead with this.** Three symptoms, one root cause. Your app renders fast from the server, then the console throws a hydration mismatch and a chunk of the page flickers and re-renders on the client. Or the server crashes outright with `window is not defined`. Or you get a warning that `useLayoutEffect` does nothing on the server and can't figure out why it matters. All three are the same contract being violated: **the server produced HTML, and the client's first render must agree with it.** Server-side rendering is two renders of the same tree — one on the server that makes HTML, one on the client that adopts that HTML — and everything that goes wrong goes wrong at the seam between them. This article is the framework-agnostic mechanics of that seam: how hydration matches the DOM, why mismatches happen and what React 19 does about them, how to read browser-only values without breaking the agreement, and how errors flow through the streaming pipeline. Next.js applies all of this ([`nextjs-and-rsc-in-practice`](./nextjs-and-rsc-in-practice.md)); here's what it's applying.
 

@@ -1,5 +1,6 @@
 ---
 article_id: suspense
+description: You have a dashboard where three widgets each fetch their own data. The naive version threads an `isLoading` boolean through every one, and the render is a thicket of `if (loading) return <Spinner/>` repeated per widget, plus a parent that has to decide whether to gate the whole page on all three.
 concept_folder: concurrent
 wave: 3
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Suspense
 
 > **Lead with this.** You have a dashboard where three widgets each fetch their own data. The naive version threads an `isLoading` boolean through every one, and the render is a thicket of `if (loading) return <Spinner/>; if (error) return <Error/>; return <Data/>` repeated per widget, plus a parent that has to decide whether to gate the whole page on all three. Suspense inverts this: a component *suspends* — it tells React "I'm not ready" — and the nearest `<Suspense>` boundary shows a fallback until it is. Loading stops being a value you plumb through props and becomes a **boundary in the tree**, the same way an error boundary made failure a boundary instead of a return value. The catch worth stating up front: Suspense handles *pending*. It does **not** handle *rejected* — that's still an error boundary's job, and the two are designed to be stacked.
 

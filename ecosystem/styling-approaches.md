@@ -1,5 +1,6 @@
 ---
 article_id: styling-approaches
+description: "Styling isn't a beauty contest between libraries; it's a decision on three axes — runtime vs build-time, how styles get scoped, and how you prefer to author them. The axis that reorganized everything is the first: styling work has moved out of runtime and into the build."
 concept_folder: ecosystem
 wave: 4
 related:
@@ -13,6 +14,8 @@ status:
   drafted: true
   reviewed: false
 ---
+
+# Styling approaches
 
 > **Lead with this:** Styling isn't a beauty contest between libraries; it's a decision on three axes — runtime vs build-time, how styles get scoped, and how you prefer to author them. The axis that reorganized everything is the first one: the industry has moved styling work *out of runtime and into the build*, and React 19's Server Components accelerated it by making runtime CSS-in-JS genuinely awkward. For a new React app the default is now build-time — CSS Modules, Tailwind, or zero-runtime CSS-in-JS — and runtime CSS-in-JS has retreated to the cases that still need it. This is a decision table, not a tour.
 
